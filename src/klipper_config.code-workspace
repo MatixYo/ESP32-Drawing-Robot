@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../../../Druk 3D/klipper_config"
+		},
+		{
+			"name": "Tenstar C3 Mini",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
