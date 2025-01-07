@@ -60,12 +60,14 @@ bool calculateServoAngles(float x, float y, float &angle1, float &angle2)
   // Inverse kinematics for left servo
   float alpha1 = atan2(y - y1, x - x1);                           // Base angle to target
   float beta1 = acos((sq(L2) + sq(d1) - sq(L3)) / (2 * L2 * d1)); // Law of cosines
-  angle1 = degrees(alpha1 + beta1);                               // Combine and convert to degrees
+  float rawAngle1 = alpha1 + beta1;                               // Combine angles in radians
+  angle1 = degrees(rawAngle1);                                    // Convert to degrees
 
   // Inverse kinematics for right servo
   float alpha2 = atan2(y - y2, x - x2);                           // Base angle to target
   float beta2 = acos((sq(L2) + sq(d2) - sq(L3)) / (2 * L2 * d2)); // Law of cosines
-  angle2 = degrees(alpha2 - beta2);                               // Combine and convert to degrees
+  float rawAngle2 = alpha2 - beta2;                               // Combine angles in radians
+  angle2 = degrees(rawAngle2);                                    // Convert to degrees
 
   // Ensure angles are within servo limits (0 to 180 degrees)
   if (angle1 < 0 || angle1 > 180 || angle2 < 0 || angle2 > 180)
@@ -123,13 +125,27 @@ void setup()
       float angle1, angle2;
       if (calculateServoAngles(penX, penY, angle1, angle2)) {
         servo1.write(angle1);
-        servo2.write(angle2);  // Adjust for servo2 orientation
+        servo2.write(angle2);
         Serial.printf("Pen moved to X: %.2f, Y: %.2f (Angles: %.2f, %.2f)\n", penX, penY, angle1, angle2);
+        request->send(200, "text/plain", "OK");
       } else {
         Serial.println("Position out of reach!");
+        request->send(400, "text/plain", "Position out of reach");
       }
     }
-    request->send(200, "text/plain", "OK"); });
+    request->send(400, "text/plain", "Missing params"); });
+
+  server.on("/controlAngles", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    if (request->hasParam("a1") && request->hasParam("a2")) {
+      float angle1 = request->getParam("a1")->value().toFloat();
+      float angle2 = request->getParam("a2")->value().toFloat();
+      servo1.write(angle1);
+      servo2.write(angle2);
+      Serial.printf("Servo angles set to %.2f, %.2f\n", angle1, angle2);
+      request->send(200, "text/plain", "OK");
+    }
+    request->send(400, "text/plain", "Missing params"); });
 
   server.on("/lift", HTTP_GET, [](AsyncWebServerRequest *request)
             {
@@ -141,6 +157,10 @@ void setup()
       } else if (direction == "down") {
         liftServo.write(liftDown);
         Serial.println("Pen lifted down.");
+      } else if(direction == "reset") {
+        servo1.write(180);
+        servo2.write(0);
+        Serial.println("Pen lifted down and servos reset.");
       }
     }
     request->send(200, "text/plain", "OK"); });
