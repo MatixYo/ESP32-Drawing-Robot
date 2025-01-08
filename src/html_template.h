@@ -16,13 +16,13 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
   <p>Pen X Position: <span id="xPos"></span></p>
   <input type="range" min="-50" max="50" class="slider" id="xSlider" value="%XPOS%" onchange="updateX(this.value)"/>
   <p>Pen Y Position: <span id="yPos"></span></p>
-  <input type="range" min="0" max="100" class="slider" id="ySlider" value="%YPOS%" onchange="updateY(this.value)"/>
+  <input type="range" min="30" max="125" class="slider" id="ySlider" value="%YPOS%" onchange="updateY(this.value)"/>
 
   <h2>Set Servo Angles</h2>
-  <p>Servo 1 Angle: <span id="a1Pos"></span></p>
-  <input type="range" min="0" max="180" class="slider" id="angle1" value="180" onchange="updateA1(this.value)"/>
-  <p>Servo 2 Angle: <span id="a2Pos"></span></p>
-  <input type="range" min="0" max="180" class="slider" id="angle2" value="0" onchange="updateA2(this.value)"/>
+  <p>Servo Left Angle: <span id="a1Pos"></span></p>
+  <input type="range" min="0" max="180" class="slider" id="angle1" value="0" onchange="updateA1(this.value)"/>
+  <p>Servo Right Angle: <span id="a2Pos"></span></p>
+  <input type="range" min="0" max="180" class="slider" id="angle2" value="180" onchange="updateA2(this.value)"/>
 
   <div>
     <button onclick="lift('up')">Lift Up</button>
