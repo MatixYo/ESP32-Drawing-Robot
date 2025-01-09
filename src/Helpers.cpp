@@ -5,7 +5,7 @@ struct Arc
     Position center;
     float radius;
     float endAngleRad;
-    bool clockwise;
+    int dir;
 };
 
 Servo servoLift;
@@ -120,6 +120,7 @@ void updateLinearMove(float delta)
     Position newPosition;
     newPosition.x = currentPosition.x - cos(angle) * distance;
     newPosition.y = currentPosition.y - sin(angle) * distance;
+
     setPenPosition(newPosition);
 
     if (arePositionsEqual(currentPosition, *linearTargetPosition))
@@ -136,10 +137,21 @@ void updateArcMove(float delta)
     Arc &arc = *arcTarget;
 
     float angularDeltaRad = SPEED * delta / arc.radius;
+    // print center and current position
     float currentAngleRad = angleBetweenPoints(arc.center, currentPosition);
-    currentAngleRad += arc.clockwise * angularDeltaRad;
+    currentAngleRad += arc.dir * angularDeltaRad;
 
-    // TODO: finish this function
+    // if (currentAngleRad > arc.endAngleRad)
+    // {
+    //     arcTarget = nullptr;
+    //     return;
+    // }
+
+    Position newPosition;
+    newPosition.x = arc.center.x + arc.radius * cos(currentAngleRad);
+    newPosition.y = arc.center.y + arc.radius * sin(currentAngleRad);
+
+    setPenPosition(newPosition);
 }
 
 void updateToolPosition()
@@ -158,6 +170,12 @@ void updateToolPosition()
     }
 }
 
+void resetTargets()
+{
+    linearTargetPosition = nullptr;
+    arcTarget = nullptr;
+}
+
 // Public methods
 Position getCurrentPosition()
 {
@@ -166,33 +184,37 @@ Position getCurrentPosition()
 
 void homeXY()
 {
+    resetTargets();
     liftTool(true);
     setPenPosition(HOMING_POSITION);
 }
 
 void linearMove(Position &position)
 {
-    Serial.printf("Moving to X: %.2f, Y: %.2f\n", position.x, position.y);
+    resetTargets();
     linearTargetPosition = &position;
+
+    Serial.printf("Moving to X: %.2f, Y: %.2f\n", position.x, position.y);
 }
 
-void arcMove(Position &center, bool clockwise, Position *end)
+void arcMove(Position center, bool clockwise, Position *end)
 {
-    Serial.printf("Moving in an arc.");
+    resetTargets();
 
-    Arc arc;
+    static Arc arc;
     arc.center = center;
     arc.radius = distanceBetweenPoints(center, currentPosition);
     arc.endAngleRad = angleBetweenPoints(center, end ? *end : currentPosition);
-    arc.clockwise = clockwise;
-
-    Serial.printf("Center: X: %.2f, Y: %.2f, Radius: %.2f, End Angle: %.2f, Clockwise: %d\n", center.x, center.y, arc.radius, arc.endAngleRad, clockwise);
+    arc.dir = clockwise ? 1 : -1;
 
     arcTarget = &arc;
+
+    Serial.printf("Moving in an arc.\n");
 }
 
 void liftTool(bool up)
 {
+    resetTargets();
     servoLift.write(up ? LIFT_UP_ANGLE : LIFT_DOWN_ANGLE);
     delay(500);
 }

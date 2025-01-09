@@ -125,6 +125,9 @@ void setup()
     arcMove(center);
     request->send(200, "text/plain", "OK"); });
 
+  server.on("/reset", HTTP_GET, [](AsyncWebServerRequest *request)
+            { ESP.restart(); });
+
   server.begin();
 }
 

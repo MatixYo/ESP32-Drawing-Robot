@@ -111,9 +111,9 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
   <div class="container">
     <h2>Draw Circle</h2>
     <div class="control-group">
-      <label for="radiusSlider">Radius: <span class="value" id="radiusVal">30</span></label>
+      <label for="radiusSlider">Radius: <span class="value" id="radiusVal">20</span></label>
       <div class="slider-container">
-        <input type="range" min="10" max="100" class="slider" id="radiusSlider" value="30">
+        <input type="range" min="10" max="100" class="slider" id="radiusSlider" value="20">
       </div>
     </div>
     <div class="button-group">
@@ -125,6 +125,7 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
     <button onclick="lift('up')">Lift Up</button>
     <button onclick="lift('down')">Lift Down</button>
     <button onclick="homeXY()">Home XY</button>
+    <button onclick="reset()">Reset ESP</button>
   </div>
 
   <script>
@@ -157,6 +158,7 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
     function drawCircle(r) { $.get('/circle?&r=' + r); }
     function lift(direction) { $.get('/lift?direction=' + direction); }
     function homeXY() { $.get('/homeXY'); }
+    function reset() { $.get('/reset'); }
   </script>
 </body>
 </html>

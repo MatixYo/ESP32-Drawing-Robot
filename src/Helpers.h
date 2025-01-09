@@ -12,7 +12,7 @@ void homeXY();
 
 void linearMove(Position &position);
 
-void arcMove(Position &center, bool clockwise = true, Position *end = nullptr);
+void arcMove(Position center, bool clockwise = true, Position *end = nullptr);
 
 void liftTool(bool up);
 
