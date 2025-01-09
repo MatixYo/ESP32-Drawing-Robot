@@ -4,6 +4,7 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
+  <title>ESP32 Drawing Robot</title>
   <style>
     body {
       font-family: 'Trebuchet MS', Arial, sans-serif;
@@ -116,38 +117,22 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
       </div>
     </div>
     <div class="button-group">
-      <button onclick="drawCircle(xSlider.value, ySlider.value, radiusSlider.value)">Draw Circle</button>
-    </div>
-  </div>
-
-  <div class="container">
-    <h2>Set Servo Angles</h2>
-    <div class="control-group">
-      <label for="angle1">Servo Left Angle: <span class="value" id="a1Pos">0</span></label>
-      <div class="slider-container">
-        <input type="range" min="0" max="180" class="slider" id="angle1" value="0" onchange="updateA1(this.value)">
-      </div>
-    </div>
-    <div class="control-group">
-      <label for="angle2">Servo Right Angle: <span class="value" id="a2Pos">180</span></label>
-      <div class="slider-container">
-        <input type="range" min="0" max="180" class="slider" id="angle2" value="180" onchange="updateA2(this.value)">
-      </div>
+      <button onclick="drawCircle(radiusSlider.value)">Draw Circle</button>
     </div>
   </div>
 
   <div class="container button-group">
     <button onclick="lift('up')">Lift Up</button>
     <button onclick="lift('down')">Lift Down</button>
-    <button onclick="reset()">Reset</button>
+    <button onclick="homeXY()">Home XY</button>
   </div>
 
   <script>
       $.ajaxSetup({
       timeout: 10000,
-      error: function(xhr) {
-        alert(xhr.responseText);
-      }
+      // error: function(xhr) {
+      //   alert(xhr.responseText);
+      // }
     });
 
     const xSlider = document.getElementById('xSlider');
@@ -160,15 +145,6 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
     yPos.textContent = ySlider.value;
     ySlider.oninput = function () { yPos.textContent = this.value; };
 
-    const angle1 = document.getElementById('angle1');
-    const angle2 = document.getElementById('angle2');
-    const a1Pos = document.getElementById('a1Pos');
-    const a2Pos = document.getElementById('a2Pos');
-    a1Pos.textContent = angle1.value;
-    a2Pos.textContent = angle2.value;
-    angle1.oninput = function () { a1Pos.textContent = this.value; };
-    angle2.oninput = function () { a2Pos.textContent = this.value; };
-
     const radiusSlider = document.getElementById('radiusSlider');
     const radiusVal = document.getElementById('radiusVal');
     radiusVal.textContent = radiusSlider.value;
@@ -178,14 +154,11 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
     function updateY(y) { sendXY(xSlider.value, y); }
     function sendXY(x, y) { $.get('/controlXY?x=' + x + '&y=' + y); }
 
-    function updateA1(a1) { sendAngle(a1, angle2.value); }
-    function updateA2(a2) { sendAngle(angle1.value, a2); }
-    function sendAngle(a1, a2) { $.get('/controlAngles?a1=' + a1 + '&a2=' + a2); }
-
-    function drawCircle(x, y, r) { $.get('/circle?x=' + x + '&y=' + y + '&r=' + r); }
+    function drawCircle(r) { $.get('/circle?&r=' + r); }
     function lift(direction) { $.get('/lift?direction=' + direction); }
-    function reset() { $.get('/reset'); }
+    function homeXY() { $.get('/homeXY'); }
   </script>
 </body>
 </html>
 )rawliteral";
+// TODO: homing should set position to home position
