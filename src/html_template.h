@@ -230,8 +230,9 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
 
         function startDrawing() {
             const isDrawing = drawingMode();
-            if (isDrawing) return;
+            if (isDrawing) return false;
             addGcode('M3');
+            return true;
         }
 
         function endDrawing() {
@@ -268,8 +269,9 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
 
         function drawLinePoint(x, y) {
             addGcode(`G1 X${f(x)} Y${f(y)}`);
-            startDrawing();
-            addGcode(`G1 X${f(x)} Y${f(y)}`);
+            if(startDrawing()) {
+                addGcode(`G1 X${f(x)} Y${f(y)}`);
+            }
         }
 
         function handleBedClick(e) {
@@ -286,12 +288,10 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
 
         function sendPrint() {
             endDrawing();
-            addGcode('G28');
-            sendGcode(gcode);
+            sendGcode(`${gcode}\nG28`);
         }
 
-        updateRenderedPosition(0, 0);
-        // updateRenderedPosition(% XPOS %, % YPOS %);
+        updateRenderedPosition(%X_POS%, %Y_POS%);
 
         function move(x, y) {
             sendGcode(`G1 X${f(x)} Y${f(y)}`);
