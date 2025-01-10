@@ -4,8 +4,8 @@ struct Arc
 {
     Position center;
     float radius;
-    float endAngleRad;
     int dir;
+    float angleDelta;
 };
 
 Servo servoLift;
@@ -18,16 +18,23 @@ Position currentPosition = HOMING_POSITION;
 // Targets
 Position *linearTargetPosition = nullptr;
 Arc *arcTarget = nullptr;
+int delayUntil;
 
 // Last update time
 int lastUpdate;
 
 // Static functions
+/**
+ * @brief Returns the angle between two points in radians (-
+ */
 float angleBetweenPoints(const Position &p1, const Position &p2)
 {
     return atan2(p2.y - p1.y, p2.x - p1.x);
 }
 
+/**
+ * @brief Returns the distance between two points
+ */
 float distanceBetweenPoints(const Position &p1, const Position &p2)
 {
     return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
@@ -36,17 +43,21 @@ float distanceBetweenPoints(const Position &p1, const Position &p2)
 // Function to calculate servo angles
 bool calculateServoAngles(const Position &position, Angles &angles)
 {
-    if (position.x < MIN_X || position.x > MAX_X || position.y < MIN_Y || position.y > MAX_Y)
+    // Invert x axis
+    int x = -position.x;
+    int y = position.y;
+
+    if (x < MIN_X || x > MAX_X || y < MIN_Y || y > MAX_Y)
     {
         return false;
     }
     // Calculate the horizontal distances from each servo
-    float x1 = position.x + L1 / 2; // Offset for the left servo
-    float x2 = position.x - L1 / 2; // Offset for the right servo
+    float x1 = x + L1 / 2; // Offset for the left servo
+    float x2 = x - L1 / 2; // Offset for the right servo
 
     // Calculate the distance from each servo base to the target point
-    float D1 = sqrt(pow(x1, 2) + pow(position.y, 2));
-    float D2 = sqrt(pow(x2, 2) + pow(position.y, 2));
+    float D1 = sqrt(pow(x1, 2) + pow(y, 2));
+    float D2 = sqrt(pow(x2, 2) + pow(y, 2));
 
     // Check if the point is reachable
     if (D1 > (L2 + L3) || D2 > (L2 + L3) || D1 < fabs(L2 - L3) || D2 < fabs(L2 - L3))
@@ -55,12 +66,12 @@ bool calculateServoAngles(const Position &position, Angles &angles)
     }
 
     // Calculate the angles for the left servo (θ1)
-    float gamma1 = atan2(x1, position.y); // Angle from the servo to the point
+    float gamma1 = atan2(x1, y); // Angle from the servo to the point
     float theta1 = acos((pow(L2, 2) + pow(D1, 2) - pow(L3, 2)) / (2 * L2 * D1));
     angles.left = degrees(theta1 - gamma1); // Counterclockwise rotation for left servo
 
     // Calculate the angles for the right servo (θ2)
-    float gamma2 = atan2(x2, position.y); // Angle from the servo to the point
+    float gamma2 = atan2(x2, y); // Angle from the servo to the point
     float theta2 = acos((pow(L2, 2) + pow(D2, 2) - pow(L3, 2)) / (2 * L2 * D2));
     angles.right = 180 - degrees(gamma2 + theta2); // Counterclockwise rotation for right servo
 
@@ -113,7 +124,6 @@ void updateLinearMove(float delta)
     float dy = currentPosition.y - linearTargetPosition->y;
     float angle = atan2(dy, dx);
     float maxDistance = sqrt(pow(dx, 2) + pow(dy, 2));
-
     float distance = min(travelDistance, maxDistance);
 
     // Move the pen to the new position
@@ -137,15 +147,17 @@ void updateArcMove(float delta)
     Arc &arc = *arcTarget;
 
     float angularDeltaRad = SPEED * delta / arc.radius;
-    // print center and current position
-    float currentAngleRad = angleBetweenPoints(arc.center, currentPosition);
-    currentAngleRad += arc.dir * angularDeltaRad;
 
-    // if (currentAngleRad > arc.endAngleRad)
-    // {
-    //     arcTarget = nullptr;
-    //     return;
-    // }
+    float currentAngleRad = angleBetweenPoints(arc.center, currentPosition);
+    float angleIncrement = arc.dir * angularDeltaRad;
+    arc.angleDelta += angleIncrement;
+    currentAngleRad += angleIncrement;
+
+    if (arc.angleDelta >= 2 * PI)
+    {
+        arcTarget = nullptr;
+        return;
+    }
 
     Position newPosition;
     newPosition.x = arc.center.x + arc.radius * cos(currentAngleRad);
@@ -159,6 +171,9 @@ void updateToolPosition()
     int currentTime = millis();
     float delta = (currentTime - lastUpdate) / 1000.0;
     lastUpdate = currentTime;
+
+    if (currentTime < delayUntil)
+        return;
 
     if (linearTargetPosition)
     {
@@ -182,19 +197,26 @@ Position getCurrentPosition()
     return currentPosition;
 }
 
+void waitFor(int delayMs)
+{
+    delayUntil = millis() + delayMs;
+}
+
 void homeXY()
 {
     resetTargets();
-    liftTool(true);
+    enableTool(false);
     setPenPosition(HOMING_POSITION);
 }
 
 void linearMove(Position &position)
 {
     resetTargets();
-    linearTargetPosition = &position;
+    linearTargetPosition = new Position();
+    linearTargetPosition->x = position.x;
+    linearTargetPosition->y = position.y;
 
-    Serial.printf("Moving to X: %.2f, Y: %.2f\n", position.x, position.y);
+    Serial.printf("Moving to X: %.2f, Y: %.2f\n", linearTargetPosition->x, linearTargetPosition->y);
 }
 
 void arcMove(Position center, bool clockwise, Position *end)
@@ -204,17 +226,23 @@ void arcMove(Position center, bool clockwise, Position *end)
     static Arc arc;
     arc.center = center;
     arc.radius = distanceBetweenPoints(center, currentPosition);
-    arc.endAngleRad = angleBetweenPoints(center, end ? *end : currentPosition);
     arc.dir = clockwise ? 1 : -1;
+    arc.angleDelta = 0;
 
     arcTarget = &arc;
 
     Serial.printf("Moving in an arc.\n");
 }
 
-void liftTool(bool up)
+void enableTool(bool enable)
 {
     resetTargets();
-    servoLift.write(up ? LIFT_UP_ANGLE : LIFT_DOWN_ANGLE);
-    delay(500);
+
+    servoLift.write(enable ? LIFT_DOWN_ANGLE : LIFT_UP_ANGLE);
+    waitFor(500); // TODO: check delay
+}
+
+bool isBusy()
+{
+    return linearTargetPosition || arcTarget || millis() < delayUntil;
 }

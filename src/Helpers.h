@@ -8,12 +8,16 @@ extern Servo servoRight;
 
 Position getCurrentPosition();
 
+void waitFor(int delayMs);
+
 void homeXY();
 
 void linearMove(Position &position);
 
 void arcMove(Position center, bool clockwise = true, Position *end = nullptr);
 
-void liftTool(bool up);
+void enableTool(bool enable = true);
+
+bool isBusy();
 
 void updateToolPosition();

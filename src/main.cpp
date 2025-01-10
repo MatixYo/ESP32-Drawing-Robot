@@ -1,55 +1,31 @@
 #include <Arduino.h>
 #include <WiFiManager.h>
 #include <ESPAsyncWebServer.h>
-#include <Helpers.h>
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+#include <GCode.h>
 
-#include "html_template.h"
+#include <html_template.h>
 
 // WiFi and server setup
 WiFiManager wifiManager;
 AsyncWebServer server(80);
 
-bool drawCircle(float x, float y, float radius)
-{
-  int points = 36;
-  float increment = 360.0 / points;
-  float travelTime = radius / points * 50;
-  Serial.println("Drawing circle..." + String(travelTime) + "ms per point " + String(increment) + " degrees per point");
-
-  liftTool(true);
-  // go to first point
-  // movePen(x + radius, y);
-  liftTool(false);
-  // Draw a circle with the given radius centered at (x, y)
-  for (float angle = 0; angle <= 360; angle += increment)
-  {
-    Serial.println("Angle: " + String(angle));
-    float angleRad = radians(angle);
-    float x1 = x + radius * cos(angleRad);
-    float y1 = y + radius * sin(angleRad);
-    // movePen(x + radius, y);
-    delay(travelTime);
-  }
-  Serial.println("Circle drawn.");
-
-  return true;
-}
-
 // HTML variable processor
 String processor(const String &var)
 {
   Position curr = getCurrentPosition();
-  if (var == "XPOS")
+  if (var == "X_POS")
     return String(curr.x);
-  if (var == "YPOS")
+  if (var == "Y_POS")
     return String(curr.y);
-  if (var == "XMIN")
+  if (var == "X_MIN")
     return String(MIN_X);
-  if (var == "XMAX")
+  if (var == "X_MAX")
     return String(MAX_X);
-  if (var == "YMIN")
+  if (var == "Y_MIN")
     return String(MIN_Y);
-  if (var == "YMAX")
+  if (var == "Y_MAX")
     return String(MAX_Y);
   return String();
 }
@@ -83,55 +59,43 @@ void setup()
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send_P(200, "text/html", htmlTemplate, processor); });
 
-  server.on("/controlXY", HTTP_GET, [](AsyncWebServerRequest *request)
+  server.on("/gcode", HTTP_POST, [](AsyncWebServerRequest *request)
             {
-    if (request->hasParam("x") && request->hasParam("y")) {
-      float x = request->getParam("x")->value().toFloat();
-      float y = request->getParam("y")->value().toFloat();
+              if(request->hasParam("gcode", true))
+              {
+                String gcode = request->getParam("gcode", true)->value();
+                setGCode(gcode);
+                request->send(200, "text/plain", "OK");
+              }
 
-      Position pos = {x, y};
-      linearMove(pos);
-      request->send(200, "text/plain", "OK");
-    }
-    request->send(400, "text/plain", "Missing params"); });
+              request->send(400, "text/plain", "Missing gcode parameter"); });
 
-  server.on("/lift", HTTP_GET, [](AsyncWebServerRequest *request)
+  server.on("/reset", HTTP_POST, [](AsyncWebServerRequest *request)
             {
-    if (request->hasParam("direction")) {
-      String direction = request->getParam("direction")->value();
-      if (direction == "up") {
-        liftTool(true);
-        Serial.println("Pen lifted up.");
-      } else if (direction == "down") {
-        liftTool(false);
-        Serial.println("Pen lifted down.");
-      }
-    }
-    request->send(200, "text/plain", "OK"); });
+              Serial.println("Resetting ESP...");
+              ESP.restart(); });
 
-  server.on("/homeXY", HTTP_GET, [](AsyncWebServerRequest *request)
+  server.on("/state", HTTP_GET, [](AsyncWebServerRequest *request)
             {
-              homeXY();
-    Serial.println("Home position set.");
+      AsyncResponseStream *response = request->beginResponseStream("application/json");
 
-    request->send(200, "text/plain", "OK"); });
+      JsonDocument doc;
 
-  server.on("/circle", HTTP_GET, [](AsyncWebServerRequest *request)
-            {
-    float radius = request->getParam("r")->value().toFloat();
-    Position center = getCurrentPosition();
-    center.y += radius;
+      Position pos = getCurrentPosition();
+      doc["x"] = pos.x;
+      doc["y"] = pos.y;
+      doc["busy"] = isBusy();
+      doc["raised"] = servoLift.read() == LIFT_UP_ANGLE;
 
-    arcMove(center);
-    request->send(200, "text/plain", "OK"); });
+      serializeJson(doc, *response);
 
-  server.on("/reset", HTTP_GET, [](AsyncWebServerRequest *request)
-            { ESP.restart(); });
+      request->send(response); });
 
   server.begin();
 }
 
 void loop()
 {
+  machineLoop();
   updateToolPosition();
 }
