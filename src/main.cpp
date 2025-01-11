@@ -70,9 +70,9 @@ void setup()
 
               request->send(400, "text/plain", "Missing gcode parameter"); });
 
-  server.on("/reset", HTTP_POST, [](AsyncWebServerRequest *request)
+  server.on("/restart", HTTP_POST, [](AsyncWebServerRequest *request)
             {
-              Serial.println("Resetting ESP...");
+              Serial.println("Restarting ESP...");
               ESP.restart(); });
 
   server.on("/state", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -90,6 +90,12 @@ void setup()
       serializeJson(doc, *response);
 
       request->send(response); });
+
+  server.on("/assembly", HTTP_POST, [](AsyncWebServerRequest *request)
+            {
+              Serial.println("Assembly...");
+              assemblyPosition();
+              request->send(200, "text/plain", "OK"); });
 
   server.begin();
 }

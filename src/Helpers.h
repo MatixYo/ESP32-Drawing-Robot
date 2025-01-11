@@ -18,6 +18,8 @@ void arcMove(Position center, bool clockwise = true, Position *end = nullptr);
 
 void enableTool(bool enable = true);
 
+void assemblyPosition();
+
 bool isBusy();
 
 void updateToolPosition();

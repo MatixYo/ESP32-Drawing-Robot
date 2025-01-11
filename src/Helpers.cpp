@@ -234,12 +234,24 @@ void arcMove(Position center, bool clockwise, Position *end)
     Serial.printf("Moving in an arc.\n");
 }
 
+void internalEnableTool(bool enable)
+{
+    servoLift.write(enable ? LIFT_DOWN_ANGLE : LIFT_UP_ANGLE);
+}
+
 void enableTool(bool enable)
 {
     resetTargets();
 
-    servoLift.write(enable ? LIFT_DOWN_ANGLE : LIFT_UP_ANGLE);
+    internalEnableTool(enable);
     waitFor(500); // TODO: check delay
+}
+
+void assemblyPosition()
+{
+    internalEnableTool(false);
+    Angles angles = {0, 180};
+    setServoAngles(angles);
 }
 
 bool isBusy()

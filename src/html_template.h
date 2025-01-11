@@ -57,9 +57,9 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
             background-color: #007acc;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
             cursor: pointer;
             transition: background-color 0.2s ease-in-out;
         }
@@ -158,7 +158,8 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
         <button onclick="raise()">Raise Pen</button>
         <button onclick="raise(false)">Lower Pen</button>
         <button onclick="home()">Home XY</button>
-        <button onclick="reset()">Reset ESP</button>
+        <button onclick="restart()">Restart ESP</button>
+        <button onclick="assembly()">Assembly</button>
     </div>
 
     <div class="container">
@@ -316,7 +317,8 @@ const char htmlTemplate[] PROGMEM = R"rawliteral(
         function getState() {
             return $.get('/state');
         }
-        function reset() { $.post('/reset'); }
+        function restart() { $.post('/restart'); }
+        function assembly() { $.post('/assembly'); }
     </script>
 </body>
 
