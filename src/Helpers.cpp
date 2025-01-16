@@ -249,7 +249,7 @@ void enableTool(bool enable)
 
 void assemblyPosition()
 {
-    internalEnableTool(false);
+    internalEnableTool(true);
     Angles angles = {0, 180};
     setServoAngles(angles);
 }
