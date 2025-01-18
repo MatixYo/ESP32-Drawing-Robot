@@ -1,18 +1,20 @@
-import { useState } from 'react';
-import { f, nmap, normalizePosition } from '../../lib/helpers';
+import { useRef, useState } from 'react';
+
+import { nmap, normalizePosition } from '../../lib/helpers';
 import { Config } from '../../types/config';
 import { Position } from '../../types/position';
 import { Canvas } from './canvas';
 import s from './print-surface.module.css';
 import { Switch } from '../button/switch';
-import { isToolLowered } from '../../lib/gcode';
+import { isToolLowered, moveGCode, f } from '../../lib/gcode';
+import { useOutsideClick } from '../../hooks/use-outside-click';
 
 interface PrintSurfaceProps {
   config: Config;
   toolPosition: Position;
   setToolPosition: (position: Position) => void;
   gcode: string[];
-  addGCode: (line: string) => void;
+  addGCode: (line: string | string[]) => void;
 }
 
 type Mode = 'move' | 'line' | 'circle';
@@ -29,13 +31,6 @@ export function PrintSurface({
 
   const [mode, setMode] = useState<Mode>('move');
 
-  const handleModeChange = (mode: Mode) => {
-    if (isToolLowered(gcode)) {
-      addGCode('M5');
-    }
-    setMode(mode);
-  };
-
   const handleClick = (e: React.PointerEvent<HTMLDivElement>) => {
     const positon = normalizePosition(e, config);
 
@@ -44,9 +39,9 @@ export function PrintSurface({
     }
     if (mode === 'line') {
       if (!isToolLowered(gcode)) {
-        addGCode('M3');
+        addGCode([moveGCode(positon), 'M3']);
       }
-      addGCode(`G1 X${f(positon.x)} Y${f(positon.y)}`);
+      addGCode(moveGCode(positon));
     }
   };
 
@@ -65,6 +60,13 @@ export function PrintSurface({
     top: `${nmap(toolPosition.y, config.minY, config.maxY, 0, 100)}%`,
   };
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  useOutsideClick(containerRef, () => {
+    if (isToolLowered(gcode)) {
+      addGCode('M5');
+    }
+  });
+
   return (
     <div className={s.printSurface}>
       <div
@@ -72,8 +74,15 @@ export function PrintSurface({
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
         onClick={handleClick}
+        ref={containerRef}
       >
-        <Canvas width={width} height={height} />
+        <Canvas
+          width={width}
+          height={height}
+          gcode={gcode}
+          config={config}
+          hoverPosition={(mode === 'line' && hoverPosition) || null}
+        />
         <div className={s.marker} style={markerStyle} />
       </div>
       <div className={s.controls}>
@@ -85,10 +94,10 @@ export function PrintSurface({
           options={[
             { id: 'move', label: 'Move' },
             { id: 'line', label: 'Line' },
-            { id: 'circle', label: 'Circle' },
+            // { id: 'circle', label: 'Circle' },
           ]}
           activeId={mode}
-          setActiveId={handleModeChange}
+          setActiveId={setMode}
         />
       </div>
     </div>

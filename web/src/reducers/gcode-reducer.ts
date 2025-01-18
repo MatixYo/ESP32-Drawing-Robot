@@ -3,14 +3,16 @@ import { useReducer } from 'react';
 type GCodeState = string[];
 
 type GCodeAction =
+  | { type: 'SET_GCODE'; payload: string[] }
   | { type: 'ADD_GCODE_LINE'; payload: string | string[] }
   | { type: 'CLEAR_LINE' }
   | { type: 'CLEAR_GCODE' };
 
 function gcodeReducer(state: GCodeState, action: GCodeAction): GCodeState {
   switch (action.type) {
+    case 'SET_GCODE':
+      return action.payload;
     case 'ADD_GCODE_LINE':
-      console.log(action.payload);
       const lines = Array.isArray(action.payload)
         ? action.payload
         : [action.payload];
@@ -27,6 +29,9 @@ function gcodeReducer(state: GCodeState, action: GCodeAction): GCodeState {
 export function useGCode() {
   const [gcode, dispatch] = useReducer(gcodeReducer, []);
 
+  const setGCode = (gcode: string[]) =>
+    dispatch({ type: 'SET_GCODE', payload: gcode });
+
   const addLine = (line: string | string[]) =>
     dispatch({ type: 'ADD_GCODE_LINE', payload: line });
 
@@ -36,6 +41,7 @@ export function useGCode() {
 
   return {
     gcode,
+    setGCode,
     addLine,
     clearLine,
     clearAll,

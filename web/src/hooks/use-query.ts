@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 
-export interface UseQueryOptions {
+export interface UseQueryOptions<T> {
   enabled?: boolean;
   refetchInterval?: number | null;
+  initialData?: T | null;
 }
 
 export interface UseQueryResult<T> {
@@ -13,10 +14,14 @@ export interface UseQueryResult<T> {
 
 export function useQuery<T>(
   queryFn: () => Promise<T>,
-  options: UseQueryOptions = {},
+  options: UseQueryOptions<T> = {},
 ): UseQueryResult<T> {
-  const { enabled = true, refetchInterval = null } = options;
-  const [data, setData] = useState<T | null>(null);
+  const {
+    enabled = true,
+    refetchInterval = null,
+    initialData = null,
+  } = options;
+  const [data, setData] = useState<T | null>(initialData);
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 

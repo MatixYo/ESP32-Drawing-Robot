@@ -19,6 +19,11 @@
   &:focus-visible {
     outline: none;
   }
+
+  &:disabled {
+    background-color: #b5cadb;
+    color: #86aac7;
+  }
 }
 
 .switch {
@@ -26,7 +31,8 @@
   gap: 1px;
   border-radius: 8px;
   overflow: hidden;
-  background-color: #064e7b;
+  background-color: #063959;
+  border: 1px solid #063959;
 
   .button {
     border-radius: 0;
@@ -36,5 +42,6 @@
 .group {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 10px;
 }

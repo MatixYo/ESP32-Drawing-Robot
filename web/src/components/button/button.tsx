@@ -1,9 +1,7 @@
 import cn from 'clsx';
 
-interface ButtonProps {
-  onClick: () => void;
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
-  disabled?: boolean;
   active?: boolean;
 }
 

@@ -73,12 +73,7 @@ void setup()
 
               request->send(400, "text/plain", "Missing gcode parameter"); });
 
-  server.on("/restart", HTTP_POST, [](AsyncWebServerRequest *request)
-            {
-              Serial.println("Restarting ESP...");
-              ESP.restart(); });
-
-  server.on("/state", HTTP_GET, [](AsyncWebServerRequest *request)
+  server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request)
             {
       AsyncResponseStream *response = request->beginResponseStream("application/json");
 
@@ -94,13 +89,35 @@ void setup()
 
       request->send(response); });
 
+  server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request) {
+      AsyncResponseStream *response = request->beginResponseStream("application/json");
+
+      JsonDocument doc;
+
+      Position pos = getCurrentPosition();
+      doc["minX"] = MIN_X;
+      doc["maxX"] = MAX_X;
+      doc["minY"] = MIN_Y;
+      doc["maxY"] = MAX_Y;
+      doc["homeX"] = HOMING_POSITION.x;
+      doc["homeY"] = HOMING_POSITION.y;
+      doc["speed"] = SPEED;
+
+      serializeJson(doc, *response);
+
+      request->send(response);
+  });
+
   server.on("/assembly", HTTP_POST, [](AsyncWebServerRequest *request)
             {
               Serial.println("Assembly...");
               assemblyPosition();
               request->send(200, "text/plain", "OK"); });
 
-  server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request) {});
+  server.on("/restart", HTTP_POST, [](AsyncWebServerRequest *request)
+            {
+              Serial.println("Restarting ESP...");
+              ESP.restart(); });
 
   server.begin();
 }
