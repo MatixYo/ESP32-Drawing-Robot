@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect } from 'preact/hooks';
 
 export function useOutsideClick<T extends HTMLElement>(
   ref: React.RefObject<T>,

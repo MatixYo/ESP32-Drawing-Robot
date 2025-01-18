@@ -114,11 +114,6 @@ void setup()
               assemblyPosition();
               request->send(200, "text/plain", "OK"); });
 
-  server.on("/restart", HTTP_POST, [](AsyncWebServerRequest *request)
-            {
-              Serial.println("Restarting ESP...");
-              ESP.restart(); });
-
   server.begin();
 }
 

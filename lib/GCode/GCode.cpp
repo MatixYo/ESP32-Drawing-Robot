@@ -56,6 +56,7 @@ void executeLine(GCodeLine &gline)
 {
     if (gline.cmd == "G1")
     {
+        Serial.println("G1: Linear move");
         Position pos;
         pos.x = gline.params["X"];
         pos.y = gline.params["Y"];
@@ -64,15 +65,22 @@ void executeLine(GCodeLine &gline)
     }
     else if (gline.cmd == "G28")
     {
+        Serial.println("G28: Homing XY");
         homeXY();
     }
     else if (gline.cmd == "M3")
     {
+        Serial.println("M3: Lower tool");
         enableTool();
     }
     else if (gline.cmd == "M5")
     {
+        Serial.println("M5: Raise tool");
         enableTool(false);
+    }
+    else if (gline.cmd == "M999") {
+        Serial.println("M999: Restarting ESP...");
+        ESP.restart();
     }
 }
 

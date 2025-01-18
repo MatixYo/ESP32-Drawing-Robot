@@ -38,6 +38,8 @@ def dump_to_file(src, dest, name):
         
         header_file.write("};\n")
 
+        print(f"Dumped {src} to {dest}. Size: {data_length} bytes.")
+
 # Perform file hexdump for each file in ./web/dist
 # Output dumped header files to ./include/web
 for file in os.listdir(paths["src"]):

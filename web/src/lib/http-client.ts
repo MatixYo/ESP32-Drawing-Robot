@@ -12,12 +12,17 @@ export function get<T>(url: string): Promise<T> {
   return request(url);
 }
 
-export function post<T, D>(url: string, data?: D): Promise<T> {
+export function post<T, D extends Record<string, any>>(
+  url: string,
+  data?: D,
+): Promise<T> {
+  const body = new FormData();
+  for (const key in data) {
+    body.append(key, data[key]);
+  }
+
   return request(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    ...(data ? { body: JSON.stringify(data) } : {}),
+    body: data ? body : undefined,
   });
 }

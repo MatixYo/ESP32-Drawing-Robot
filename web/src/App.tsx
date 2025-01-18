@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'preact/hooks';
 import { Position } from './types/position';
 import { Button } from './components/button/button';
 import { ButtonGroup } from './components/button/button-group';
@@ -8,11 +8,12 @@ import { useQuery } from './hooks/use-query';
 import {
   assembly,
   home,
+  move,
   raiseTool,
   restart,
-  print,
   getConfig,
   getStatus,
+  print,
 } from './lib/queries';
 import { useGCode } from './reducers/gcode-reducer';
 import { isToolLowered } from './lib/gcode';
@@ -56,11 +57,16 @@ export function App() {
     clearLine();
   };
 
-  const handleHome = async () => {
-    await home();
+  const handleHome = () => {
+    home();
     if (config.data) {
       setToolPosition({ x: config.data.homeX, y: config.data.homeY });
     }
+  };
+
+  const handleSetPosition = (position: Position) => {
+    move(position);
+    setToolPosition(position);
   };
 
   const handleSave = () => {
@@ -96,7 +102,7 @@ export function App() {
           <PrintSurface
             config={config.data}
             toolPosition={toolPosition}
-            setToolPosition={setToolPosition}
+            setToolPosition={handleSetPosition}
             gcode={gcode}
             addGCode={addLine}
           />

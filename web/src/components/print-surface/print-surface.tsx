@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState } from 'preact/hooks';
 
 import { nmap, normalizePosition } from '../../lib/helpers';
 import { Config } from '../../types/config';

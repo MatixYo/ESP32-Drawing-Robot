@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
+import preact from '@preact/preset-vite';
 
 import { viteSingleFile } from 'vite-plugin-singlefile';
 import { compression } from 'vite-plugin-compression2';
@@ -7,7 +7,7 @@ import { compression } from 'vite-plugin-compression2';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
+    preact(),
 
     // Bundle content into single file...
     viteSingleFile(),
