@@ -157,7 +157,7 @@
         <button onclick="raise()">Raise Pen</button>
         <button onclick="raise(false)">Lower Pen</button>
         <button onclick="home()">Home XY</button>
-        <button onclick="reset()">Reset ESP</button>
+        <button onclick="restart()">Restart ESP</button>
         <button onclick="assembly()">Assembly</button>
     </div>
 
@@ -169,14 +169,18 @@
     <script>
         $.ajaxSetup({ timeout: 10000 });
 
+        // const X_POS = %X_POS%;
+        // const Y_POS = %Y_POS%;
         // const X_MIN = %X_MIN%;
         // const X_MAX = %X_MAX%;
         // const Y_MIN = %Y_MIN%;
         // const Y_MAX = %Y_MAX%;
-        const X_MIN = -50;
-        const X_MAX = 50;
-        const Y_MIN = 25;
-        const Y_MAX = 125;
+        const X_POS = 0
+        const Y_POS = 0
+        const X_MIN = -50
+        const X_MAX = 50
+        const Y_MIN = 25
+        const Y_MAX = 125
         const X_SIZE = X_MAX - X_MIN;
         const Y_SIZE = Y_MAX - Y_MIN;
 
@@ -295,8 +299,7 @@
             sendGcode(`${gcode}\nG28`);
         }
 
-        // updateRenderedPosition(%X_POS%, %Y_POS%);
-        updateRenderedPosition(0, 0);
+        updateRenderedPosition(X_POS, Y_POS);
 
         function move(x, y) {
             sendGcode(`G1 X${f(x)} Y${f(y)}`);
@@ -321,7 +324,7 @@
         function getState() {
             return $.get('/state');
         }
-        function reset() { $.post('/reset'); }
+        function restart() { $.post('/restart'); }
         function assembly() { $.post('/assembly'); }
     </script>
 </body>

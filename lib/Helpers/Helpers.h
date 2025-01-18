@@ -1,6 +1,10 @@
+#pragma once
+
 #include <Arduino.h>
-#include <Constants.h>
 #include <ESP32Servo.h>
+
+#include <config.h>
+#include <types.h>
 
 extern Servo servoLift;
 extern Servo servoLeft;

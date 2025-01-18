@@ -1,15 +1,7 @@
-// Types
-struct Angles
-{
-    float left;
-    float right;
-};
+#pragma once
 
-struct Position
-{
-    float x;
-    float y;
-};
+#include <Arduino.h>
+#include <types.h>
 
 // Robot geometry constants
 const float L1 = 25.8; // Distance between the two servos (mm)
@@ -19,6 +11,7 @@ const float L3 = 70.0; // Length of the second arm connected to the pen (mm)
 // Lift positions
 const int LIFT_DOWN_ANGLE = 120; // Lift down angle
 const int LIFT_UP_ANGLE = 172;   // Lift up angle
+const int LIFT_WAIT = 500;       // Lift wait time
 
 // Constraints for the pen position
 const float MIN_Y = 25;  // Minimum Y position
@@ -29,7 +22,7 @@ const float MAX_X = 50;  // Maximum X position
 const Position HOMING_POSITION = {x : 0, y : MIN_Y}; // Homing position
 
 // Speed
-const float SPEED = 100; // Velocity of the pen mm/s
+const float SPEED = 150; // Velocity of the pen mm/s
 
 // Tolerance for comparing positions
 const float MAX_DELTA = 0.1;

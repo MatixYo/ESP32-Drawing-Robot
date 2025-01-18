@@ -244,7 +244,7 @@ void enableTool(bool enable)
     resetTargets();
 
     internalEnableTool(enable);
-    waitFor(500); // TODO: check delay
+    waitFor(LIFT_WAIT);
 }
 
 void assemblyPosition()

@@ -1,5 +1,8 @@
-#include <Helpers.h>
+#pragma once
+
 #include <map>
+
+#include <helpers.h>
 
 struct GCodeLine
 {

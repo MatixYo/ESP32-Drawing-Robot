@@ -3,32 +3,17 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
-#include <GCode.h>
 
-#include <html_template.h>
+// Own libraries
+#include <config.h>
+#include <gcode.h>
+
+// Website
+#include <web/index_gz.h>
 
 // WiFi and server setup
 WiFiManager wifiManager;
 AsyncWebServer server(80);
-
-// HTML variable processor
-String processor(const String &var)
-{
-  Position curr = getCurrentPosition();
-  if (var == "X_POS")
-    return String(curr.x);
-  if (var == "Y_POS")
-    return String(curr.y);
-  if (var == "X_MIN")
-    return String(MIN_X);
-  if (var == "X_MAX")
-    return String(MAX_X);
-  if (var == "Y_MIN")
-    return String(MIN_Y);
-  if (var == "Y_MAX")
-    return String(MAX_Y);
-  return String();
-}
 
 void setup()
 {
@@ -57,7 +42,25 @@ void setup()
 
   // Define route handlers
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send_P(200, "text/html", htmlTemplate, processor); });
+            {
+    // Check if website hashes still match
+    if (request->hasHeader("If-None-Match")) {
+      String etag = request->header("If-None-Match");
+      if (etag.equals(index_gz_sha)) {
+        Serial.println("ETag found. Sending 304");
+        // Respond with HTTP 304 (Not Modified) if hashes match
+        request->send(304);
+        return;
+      }
+    }
+
+    // Send new version otherwise
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", index_gz, index_gz_len);
+    response->addHeader("Content-Encoding", "gzip");
+    response->addHeader("ETag", index_gz_sha);
+
+    Serial.println("No ETag found or mismatch. Sending 200");
+    request->send(response); });
 
   server.on("/gcode", HTTP_POST, [](AsyncWebServerRequest *request)
             {
@@ -96,6 +99,8 @@ void setup()
               Serial.println("Assembly...");
               assemblyPosition();
               request->send(200, "text/plain", "OK"); });
+
+  server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request) {});
 
   server.begin();
 }
