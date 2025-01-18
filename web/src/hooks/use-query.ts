@@ -1,0 +1,49 @@
+import { useState, useEffect } from 'react';
+
+export interface UseQueryOptions {
+  enabled?: boolean;
+  refetchInterval?: number | null;
+}
+
+export interface UseQueryResult<T> {
+  data: T | null;
+  error: Error | null;
+  isLoading: boolean;
+}
+
+export function useQuery<T>(
+  queryFn: () => Promise<T>,
+  options: UseQueryOptions = {},
+): UseQueryResult<T> {
+  const { enabled = true, refetchInterval = null } = options;
+  const [data, setData] = useState<T | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await queryFn();
+        setData(response);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+
+    if (refetchInterval) {
+      const intervalId = setInterval(fetchData, refetchInterval);
+      return () => clearInterval(intervalId);
+    }
+
+    return undefined;
+  }, [queryFn, enabled, refetchInterval]);
+
+  return { data, error, isLoading };
+}

@@ -12,6 +12,7 @@
     "build:full": "pnpm build && pnpm dump"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -24,6 +25,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
+    "prettier": "3.4.2",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5"

@@ -1,35 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { Position } from './types/position';
+import { Button } from './components/button/button';
+import { ButtonGroup } from './components/button/button-group';
+import { Card } from './components/card/card';
+import { PrintSurface } from './components/print-surface/print-surface';
+import { useQuery } from './hooks/use-query';
+import {
+  assembly,
+  home,
+  raiseTool,
+  restart,
+  print,
+  getConfig,
+} from './lib/queries';
+import { useGCode } from './reducers/gcode-reducer';
 
-function App() {
-  const [count, setCount] = useState(0)
+export function App() {
+  const [toolPosition, setToolPosition] = useState<Position>({ x: 0, y: 0 });
+  const { gcode, clear: clearGCode } = useGCode();
+  const config = useQuery(getConfig);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      <Card>
+        {config.data && (
+          <PrintSurface
+            config={config.data}
+            toolPosition={toolPosition}
+            setToolPosition={setToolPosition}
+          />
+        )}
+      </Card>
 
-export default App
+      <Card>
+        <ButtonGroup>
+          <Button label="Move pen" onClick={raiseTool} active />
+          <Button label="Draw line" onClick={raiseTool} />
+          <Button label="Clear GCode" onClick={clearGCode} />
+          <Button label="Draw line" onClick={raiseTool} />
+          <Button label="Print" onClick={() => print(gcode)} />
+        </ButtonGroup>
+      </Card>
+
+      <Card title="Controls">
+        <ButtonGroup>
+          <Button label="Raise pen" onClick={raiseTool} />
+          <Button label="Lower pen" onClick={() => raiseTool(false)} />
+          <Button label="Home pen" onClick={home} />
+          <Button label="Restart ESP" onClick={restart} />
+          <Button label="Assembly" onClick={assembly} />
+        </ButtonGroup>
+      </Card>
+
+      {gcode.length > 0 && (
+        <Card title="GCode">
+          <pre>{gcode.join('\n')}</pre>
+        </Card>
+      )}
+    </>
+  );
+}

@@ -1,0 +1,28 @@
+.button {
+  background-color: #007acc;
+  color: white;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover,
+  &.active {
+    background-color: #064c77;
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
+}
+
+.group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
