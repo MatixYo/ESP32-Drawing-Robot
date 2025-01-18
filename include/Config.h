@@ -23,7 +23,7 @@ const Position HOMING_POSITION = {x : 0, y : MIN_Y}; // Homing position
 
 // Speed
 const float MIN_SPEED = 10; // Minimum speed mm/s
-const float MAX_SPEED = 200; // Maximum speed mm/s
+const float MAX_SPEED = 300; // Maximum speed mm/s
 const float DEFAULT_SPEED = 100; // Velocity of the pen mm/s
 
 // Tolerance for comparing positions

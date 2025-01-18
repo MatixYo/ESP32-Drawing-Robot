@@ -115,8 +115,8 @@ export function PrintSurface({
         <Switch
           options={[
             { id: 'move', label: 'Move' },
-            { id: 'line', label: 'Line' },
             { id: 'free', label: 'Free' },
+            { id: 'line', label: 'Line' },
             // { id: 'circle', label: 'Circle' },
           ]}
           activeId={mode}
