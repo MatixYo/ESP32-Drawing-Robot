@@ -94,10 +94,11 @@ bool setServoAngles(Angles &angles)
     int left = map(angles.left * 100, 0, 18000, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
     int right = map(angles.right * 100, 0, 18000, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
 
+    if(left < MIN_PULSE_WIDTH || left > MAX_PULSE_WIDTH || right < MIN_PULSE_WIDTH || right > MAX_PULSE_WIDTH) return false;
+    
     servoLeft.write(left);
     servoRight.write(right);
 
-    // TODO: add checks
     return true;
 }
 
