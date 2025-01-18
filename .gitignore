@@ -6,8 +6,7 @@
 
 include/web
 web/node_modules
-web/dist/*
-!web/dist/.gitkeep
+web/dist
 hash.txt
 
 # Editor directories and files
