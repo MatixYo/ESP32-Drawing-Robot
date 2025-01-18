@@ -3,6 +3,7 @@ import { Position } from '../types/position';
 import { Status } from '../types/status';
 import { moveGCode } from './gcode';
 import { post, get } from './http-client';
+import { isToolLowered } from './gcode';
 
 function sendGCode(g: string | string[]) {
   const gcode = Array.isArray(g) ? g.join('\n') : g;
@@ -31,7 +32,9 @@ export function assembly() {
 }
 
 export function print(g: string[]) {
-  return sendGCode([...g, 'G28']);
+  const gcode = [...g];
+  isToolLowered(gcode) && gcode.push('M5');
+  return sendGCode([...gcode, 'G28']);
 }
 
 // Queries

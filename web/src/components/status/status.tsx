@@ -3,7 +3,7 @@ import { getStatus } from '../../lib/queries';
 import { Tag } from '../tag/tag';
 
 export function Status() {
-  const status = useQuery(getStatus, { refetchInterval: 3000 });
+  const status = useQuery(getStatus, { refetchInterval: 2000 });
 
   if (status.error) {
     return <Tag variant="error" label="Offline" />;

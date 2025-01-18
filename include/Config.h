@@ -22,7 +22,7 @@ const float MAX_X = 50;  // Maximum X position
 const Position HOMING_POSITION = {x : 0, y : MIN_Y}; // Homing position
 
 // Speed
-const float SPEED = 120; // Velocity of the pen mm/s
+const float SPEED = 100; // Velocity of the pen mm/s
 
 // Tolerance for comparing positions
 const float MAX_DELTA = 0.1;

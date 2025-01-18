@@ -16,7 +16,6 @@ import {
   print,
 } from './lib/queries';
 import { useGCode } from './reducers/gcode-reducer';
-import { isToolLowered } from './lib/gcode';
 import { Config } from './types/config';
 import { handleStopPropagation, downloadFile, readFile } from './lib/helpers';
 
@@ -39,17 +38,6 @@ export function App() {
     if (config.data)
       setToolPosition({ x: config.data.homeX, y: config.data.homeY });
   }, [config.data]);
-
-  const handlePrint = () => {
-    const gcodeToSend = [...gcode];
-
-    if (isToolLowered(gcodeToSend)) {
-      gcodeToSend.push('M5');
-    }
-    gcodeToSend.push('G28');
-
-    print(gcode);
-  };
 
   const handleHome = () => {
     home();
@@ -76,7 +64,7 @@ export function App() {
   const hasLines = gcode.length > 0;
 
   return (
-    <>
+    <main>
       <Card
         title={
           <>
@@ -115,7 +103,11 @@ export function App() {
             onClick={handleLoad}
           />
           <Button label="Save" disabled={!hasLines} onClick={handleSave} />
-          <Button label="Print" disabled={!hasLines} onClick={handlePrint} />
+          <Button
+            label="Print"
+            disabled={!hasLines}
+            onClick={() => print(gcode)}
+          />
         </ButtonGroup>
       </Card>
 
@@ -134,6 +126,6 @@ export function App() {
           <pre>{gcode.join('\n')}</pre>
         </Card>
       )}
-    </>
+    </main>
   );
 }

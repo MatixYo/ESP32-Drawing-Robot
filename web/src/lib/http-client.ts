@@ -5,7 +5,11 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
     throw new Error(response.statusText);
   }
 
-  return response.json() as T;
+  const contentType = response.headers.get('content-type');
+  if (contentType?.includes('application/json')) {
+    return response.json() as T;
+  }
+  return response.text() as T;
 }
 
 export function get<T>(url: string): Promise<T> {

@@ -6,6 +6,8 @@ import { compression } from 'vite-plugin-compression2';
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Make websites other than the root path throw a 404
+  appType: 'mpa',
   plugins: [
     preact(),
 
