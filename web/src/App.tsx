@@ -16,6 +16,7 @@ import {
 import { useGCode } from './reducers/gcode-reducer';
 import { isToolLowered } from './lib/gcode';
 import { Config } from './types/config';
+import { downloadFile, readFile } from './lib/helpers';
 
 const initialConfig: Config = {
   minX: -50,
@@ -29,7 +30,7 @@ const initialConfig: Config = {
 
 export function App() {
   const [toolPosition, setToolPosition] = useState<Position>({ x: 0, y: 0 });
-  const { gcode, addLine, clearAll, clearLine } = useGCode();
+  const { gcode, setGCode, addLine, clearAll, clearLine } = useGCode();
   const config = useQuery(getConfig, { initialData: initialConfig });
 
   useEffect(() => {
@@ -60,6 +61,16 @@ export function App() {
     }
   };
 
+  const handleSave = () => {
+    downloadFile('drawing.gcode', gcode.join('\n'));
+  };
+
+  const handleLoad = async () => {
+    const content = await readFile(['gcode', 'txt']);
+    const lines = content.split('\n');
+    setGCode(lines);
+  };
+
   const hasLines = gcode.length > 0;
 
   return (
@@ -84,13 +95,9 @@ export function App() {
           <Button
             label="Load"
             style={{ marginLeft: 'auto' }}
-            onClick={() => console.log('Load')}
+            onClick={handleLoad}
           />
-          <Button
-            label="Save"
-            disabled={!hasLines}
-            onClick={() => console.log('Save')}
-          />
+          <Button label="Save" disabled={!hasLines} onClick={handleSave} />
           <Button label="Print" disabled={!hasLines} onClick={handlePrint} />
         </ButtonGroup>
       </Card>

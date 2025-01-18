@@ -36,3 +36,35 @@ export function normalizePosition(
   );
   return { x, y };
 }
+
+export function downloadFile(
+  filename: string,
+  data: string,
+  type = 'text/plain',
+) {
+  const a = document.createElement('a');
+  const file = new Blob([data], { type });
+  a.href = URL.createObjectURL(file);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  a.remove();
+}
+
+export function readFile(accept: string[]): Promise<string> {
+  return new Promise(resolve => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = accept.map(a => `.${a}`).join(',');
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return resolve('');
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve(reader.result as string);
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  });
+}
