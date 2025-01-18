@@ -21,11 +21,13 @@ You can find the 3D model for this project on MakerWorld:
 
 1. Clone the repository.
 2. Open the project in PlatformIO.
-3. Build and upload the project to your microcontroller.
+3. Run `cd web && npm install` to install the web app dependencies.
+4. Build and upload the project to your microcontroller.
 
 ## Config
 
-You can configure the project by changing the `config.h` file.
+You can configure the project by changing the `/include/config.h` file.
+Distance between servos and distance of linkages can be configured.
 
 ## Contact
 
