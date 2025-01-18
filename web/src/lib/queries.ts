@@ -23,7 +23,7 @@ export function home() {
 }
 
 export function restart() {
-  return sendGCode('M999');
+  return post('/restart');
 }
 
 export function assembly() {

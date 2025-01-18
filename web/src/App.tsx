@@ -3,6 +3,7 @@ import { Position } from './types/position';
 import { Button } from './components/button/button';
 import { ButtonGroup } from './components/button/button-group';
 import { Card } from './components/card/card';
+import { Status } from './components/status/status';
 import { PrintSurface } from './components/print-surface/print-surface';
 import { useQuery } from './hooks/use-query';
 import {
@@ -12,14 +13,12 @@ import {
   raiseTool,
   restart,
   getConfig,
-  getStatus,
   print,
 } from './lib/queries';
 import { useGCode } from './reducers/gcode-reducer';
 import { isToolLowered } from './lib/gcode';
 import { Config } from './types/config';
-import { downloadFile, readFile } from './lib/helpers';
-import { Tag, TagProps } from './components/tag/tag';
+import { handleStopPropagation, downloadFile, readFile } from './lib/helpers';
 
 const initialConfig: Config = {
   minX: -50,
@@ -44,17 +43,12 @@ export function App() {
   const handlePrint = () => {
     const gcodeToSend = [...gcode];
 
-    if (!isToolLowered(gcodeToSend)) {
+    if (isToolLowered(gcodeToSend)) {
       gcodeToSend.push('M5');
     }
     gcodeToSend.push('G28');
 
     print(gcode);
-  };
-
-  const handleClearLine = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    clearLine();
   };
 
   const handleHome = () => {
@@ -81,20 +75,13 @@ export function App() {
 
   const hasLines = gcode.length > 0;
 
-  const status = useQuery(getStatus, { refetchInterval: 1000 });
-  const tagProps: TagProps = status.error
-    ? { variant: 'error', label: 'Offline' }
-    : status.data?.busy
-      ? { variant: 'success', label: 'Busy' }
-      : { variant: 'normal', label: 'Idle' };
-
   return (
     <>
       <Card
         title={
           <>
             Drawing Robot
-            <Tag {...tagProps} />
+            <Status />
           </>
         }
       >
@@ -111,8 +98,16 @@ export function App() {
         <hr />
 
         <ButtonGroup>
-          <Button label="Clear" disabled={!hasLines} onClick={clearAll} />
-          <Button label="Back" disabled={!hasLines} onClick={handleClearLine} />
+          <Button
+            label="Clear"
+            disabled={!hasLines}
+            onClick={handleStopPropagation(clearAll)}
+          />
+          <Button
+            label="Back"
+            disabled={!hasLines}
+            onClick={handleStopPropagation(clearLine)}
+          />
 
           <Button
             label="Load"

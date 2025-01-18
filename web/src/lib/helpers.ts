@@ -5,6 +5,13 @@ export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+export function handleStopPropagation(cb: () => void) {
+  return (e: React.MouseEvent) => {
+    e.stopPropagation();
+    cb();
+  };
+}
+
 export function nmap(
   x: number,
   inMin: number,
@@ -56,6 +63,8 @@ export function readFile(accept: string[]): Promise<string> {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = accept.map(a => `.${a}`).join(',');
+    input.style.display = 'none';
+
     input.onchange = () => {
       const file = input.files?.[0];
       if (!file) return resolve('');
@@ -65,6 +74,7 @@ export function readFile(accept: string[]): Promise<string> {
       };
       reader.readAsText(file);
     };
+
     input.click();
   });
 }

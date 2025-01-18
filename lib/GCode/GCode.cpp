@@ -5,47 +5,20 @@ String gCode = "";
 GCodeLine parseGCodeLine(const String &line)
 {
     GCodeLine gcode;
-    int index = 0;
+    char lineBuffer[line.length() + 1];
+    line.toCharArray(lineBuffer, line.length() + 1);
 
-    // Extract the command (e.g., G1, M3)
-    while (index < line.length() && line[index] != ' ')
-    {
-        gcode.cmd += line[index++];
+    char* token = strtok(lineBuffer, " ");
+    if (token != nullptr) {
+        gcode.cmd = token;
     }
 
-    // Skip whitespace
-    while (index < line.length() && line[index] == ' ')
-    {
-        index++;
-    }
-
-    // Parse the parameters
-    while (index < line.length())
-    {
-        String key;
-        String value;
-
-        // Extract the key (e.g., X, Y, Z)
-        while (index < line.length() && isAlpha(line[index]))
-        {
-            key += line[index++];
-        }
-
-        // Extract the value (e.g., 1.0, -3.5)
-        while (index < line.length() && (isDigit(line[index]) || line[index] == '.' || line[index] == '-'))
-        {
-            value += line[index++];
-        }
-
-        if (!key.isEmpty() && !value.isEmpty())
-        {
-            gcode.params[key] = value.toFloat();
-        }
-
-        // Skip whitespace
-        while (index < line.length() && line[index] == ' ')
-        {
-            index++;
+    while ((token = strtok(nullptr, " ")) != nullptr) {
+        String param(token);
+        if (param.length() > 1) {
+            String key = param.substring(0, 1);
+            String valueStr = param.substring(1);
+            gcode.params[key] = valueStr.toFloat();
         }
     }
 
@@ -56,11 +29,11 @@ void executeLine(GCodeLine &gline)
 {
     if (gline.cmd == "G1")
     {
-        Serial.println("G1: Linear move");
         Position pos;
         pos.x = gline.params["X"];
         pos.y = gline.params["Y"];
 
+        Serial.printf("G1: Linear move to X: %.2f, Y: %.2f\n", pos.x, pos.y);
         linearMove(pos);
     }
     else if (gline.cmd == "G28")
@@ -95,19 +68,15 @@ void machineLoop()
     if (isBusy() || gCode.isEmpty())
         return;
 
-    const int lineEnd = gCode.indexOf('\n');
+    int lineEnd = gCode.indexOf('\n');
 
-    String line;
-    if (lineEnd == -1)
-    {
-        line = gCode;
-        gCode = "";
-    }
-    else
-    {
-        line = gCode.substring(0, lineEnd);
-        gCode = gCode.substring(lineEnd + 1);
-    }
+    String line = (lineEnd == -1) ? gCode : gCode.substring(0, lineEnd);
+    gCode = (lineEnd == -1) ? "" : gCode.substring(lineEnd + 1);
+
+    line.trim();
+
+    if (line.isEmpty())
+        return;
 
     GCodeLine gline = parseGCodeLine(line);
     executeLine(gline);

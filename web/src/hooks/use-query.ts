@@ -13,7 +13,7 @@ export interface UseQueryResult<T> {
 }
 
 export function useQuery<T>(
-  queryFn: () => Promise<T>,
+  queryFn: (signal: AbortSignal) => Promise<T>,
   options: UseQueryOptions<T> = {},
 ): UseQueryResult<T> {
   const {
@@ -28,15 +28,22 @@ export function useQuery<T>(
   useEffect(() => {
     if (!enabled) return;
 
+    const controller = new AbortController(); // Create an AbortController instance
+    const { signal } = controller; // Get the signal
+
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response = await queryFn();
+        const response = await queryFn(signal); // Pass the signal to the query function
         setData(response);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'));
+        if (err instanceof Error && err.name !== 'AbortError') {
+          setError(err instanceof Error ? err : new Error('Unknown error'));
+        }
       } finally {
-        setIsLoading(false);
+        if (!signal.aborted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -44,10 +51,15 @@ export function useQuery<T>(
 
     if (refetchInterval) {
       const intervalId = setInterval(fetchData, refetchInterval);
-      return () => clearInterval(intervalId);
+      return () => {
+        clearInterval(intervalId);
+        controller.abort(); // Abort the ongoing request when cleaning up
+      };
     }
 
-    return undefined;
+    return () => {
+      controller.abort(); // Abort the ongoing request if the effect is cleaned up
+    };
   }, [queryFn, enabled, refetchInterval]);
 
   return { data, error, isLoading };

@@ -12,7 +12,6 @@
 #include <web/index_gz.h>
 
 // WiFi and server setup
-WiFiManager wifiManager;
 AsyncWebServer server(80);
 
 void setup()
@@ -25,13 +24,12 @@ void setup()
 
   // Initialize WiFi
   Serial.println("Connecting to WiFi...");
+  WiFiManager wifiManager;
+  wifiManager.setConnectRetries(5);
+  wifiManager.setWiFiAutoReconnect(true);
+  wifiManager.setConnectTimeout(10);
+  WiFi.setSleep(WIFI_PS_NONE);
   wifiManager.autoConnect();
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
 
   Serial.println("\nWiFi connected.");
   Serial.println("IP address: ");
@@ -113,6 +111,11 @@ void setup()
               Serial.println("Assembly...");
               assemblyPosition();
               request->send(200, "text/plain", "OK"); });
+
+  server.on("/restart", HTTP_POST, [](AsyncWebServerRequest *request)
+            {
+              Serial.println("Restarting ESP...");
+              ESP.restart(); });
 
   server.begin();
 }
