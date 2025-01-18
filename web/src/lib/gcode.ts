@@ -27,3 +27,7 @@ export function f(value: number): string {
 export function moveGCode(pos: Position): string {
   return `G1 X${f(pos.x)} Y${f(pos.y)}`;
 }
+
+export function circleGCode(pos: Position, center: Position): string {
+  return `G2 X${f(pos.x)} Y${f(pos.y)} I${f(center.x)} J${f(center.y)}`;
+}

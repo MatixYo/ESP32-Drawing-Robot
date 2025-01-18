@@ -19,7 +19,7 @@ interface PrintSurfaceProps {
   addGCode: (line: string | string[]) => void;
 }
 
-type Mode = 'move' | 'line' | 'free';
+export type DrawMode = 'move' | 'free' | 'line' | 'circle';
 
 export function PrintSurface({
   config,
@@ -31,7 +31,8 @@ export function PrintSurface({
   const width = config.maxX - config.minX;
   const height = config.maxY - config.minY;
 
-  const [mode, setMode] = useState<Mode>('move');
+  const [mode, setMode] = useState<DrawMode>('move');
+  const [circleCenter, setCircleCenter] = useState<Position | null>(null);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const positon = normalizePosition(e, config);
@@ -44,6 +45,20 @@ export function PrintSurface({
         addGCode([moveGCode(positon), 'M3']);
       }
       addGCode(moveGCode(positon));
+    }
+    if (mode === 'circle') {
+      if (!circleCenter) {
+        setCircleCenter(positon);
+      } else {
+        if (!isToolLowered(gcode)) {
+          addGCode([moveGCode(positon), 'M3']);
+        }
+        addGCode([
+          `G2 X${f(positon.x)} Y${f(positon.y)} I${f(circleCenter.x)} J${f(circleCenter.y)}`,
+          'M5',
+        ]);
+        setCircleCenter(null);
+      }
     }
   };
 
@@ -66,6 +81,7 @@ export function PrintSurface({
   };
   const handlePointerLeave = () => {
     setHoverPosition(null);
+    setCircleCenter(null);
   };
 
   const handlePointerUp = () => {
@@ -103,7 +119,9 @@ export function PrintSurface({
           height={height}
           gcode={gcode}
           config={config}
-          hoverPosition={(mode === 'line' && hoverPosition) || null}
+          drawMode={mode}
+          circleCenter={circleCenter}
+          hoverPosition={hoverPosition}
         />
         <div className={s.marker} style={markerStyle} />
       </div>
@@ -117,7 +135,7 @@ export function PrintSurface({
             { id: 'move', label: 'Move' },
             { id: 'free', label: 'Free' },
             { id: 'line', label: 'Line' },
-            // { id: 'circle', label: 'Circle' },
+            { id: 'circle', label: 'Circle' },
           ]}
           activeId={mode}
           setActiveId={setMode}

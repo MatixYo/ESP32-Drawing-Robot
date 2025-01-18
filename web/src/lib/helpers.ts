@@ -82,3 +82,18 @@ export function readFile(accept: string[]): Promise<string> {
 export function calculateDistance(p1: Position, p2: Position): number {
   return Math.hypot(p1.x - p2.x, p1.y - p2.y);
 }
+
+export function calculateBearing(p1: Position, p2: Position): number {
+  return Math.atan2(p2.y - p1.y, p2.x - p1.x);
+}
+
+export function calculateDestination(
+  p: Position,
+  distance: number,
+  bearing: number,
+): Position {
+  return {
+    x: p.x + distance * Math.cos(bearing),
+    y: p.y + distance * Math.sin(bearing),
+  };
+}
