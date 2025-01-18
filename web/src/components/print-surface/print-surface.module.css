@@ -1,0 +1,66 @@
+.canvasWrapper {
+  position: relative;
+  background-color: #dcd9d9;
+  border: 2px solid #007acc;
+  border-radius: 2px;
+  background-image: linear-gradient(
+      rgba(31, 130, 206, 0.3) 0.1em,
+      transparent 0.1em
+    ),
+    linear-gradient(90deg, rgba(28, 117, 180, 0.3) 0.1em, transparent 0.1em);
+  background-size: 40px 40px;
+  cursor: pointer;
+}
+
+.canvas {
+  width: 100%;
+}
+
+.marker {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 18px;
+  height: 18px;
+  transform: translate(-50%, -50%);
+  transition: all 0.2s ease-in-out;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 3px;
+    height: 100%;
+    border-radius: 9999px;
+    background-color: #c72323;
+  }
+
+  &::before {
+    transform: rotate(45deg);
+  }
+
+  &::after {
+    transform: rotate(-45deg);
+  }
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  justify-content: center;
+}
+
+.position {
+  color: #555;
+  font-size: 14px;
+  margin-right: auto;
+
+  span {
+    display: inline-block;
+    min-width: 40px;
+    font-weight: bold;
+  }
+}

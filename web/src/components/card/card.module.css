@@ -1,0 +1,27 @@
+.card {
+  width: 90%;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+
+  &:not(:first-child) {
+    margin-top: 16px;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #007acc;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 10px 0;
+  }
+}

@@ -215,8 +215,6 @@ void linearMove(Position &position)
     linearTargetPosition = new Position();
     linearTargetPosition->x = position.x;
     linearTargetPosition->y = position.y;
-
-    Serial.printf("Moving to X: %.2f, Y: %.2f\n", linearTargetPosition->x, linearTargetPosition->y);
 }
 
 void arcMove(Position center, bool clockwise, Position *end)
@@ -244,7 +242,7 @@ void enableTool(bool enable)
     resetTargets();
 
     internalEnableTool(enable);
-    waitFor(500); // TODO: check delay
+    waitFor(LIFT_WAIT);
 }
 
 void assemblyPosition()
