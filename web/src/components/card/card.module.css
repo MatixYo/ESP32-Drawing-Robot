@@ -8,6 +8,9 @@
   margin: 20px 0;
 
   .title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 1.5em;
     font-weight: bold;
     margin-bottom: 10px;

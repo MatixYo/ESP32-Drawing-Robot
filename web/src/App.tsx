@@ -12,11 +12,13 @@ import {
   restart,
   print,
   getConfig,
+  getStatus,
 } from './lib/queries';
 import { useGCode } from './reducers/gcode-reducer';
 import { isToolLowered } from './lib/gcode';
 import { Config } from './types/config';
 import { downloadFile, readFile } from './lib/helpers';
+import { Tag, TagProps } from './components/tag/tag';
 
 const initialConfig: Config = {
   minX: -50,
@@ -73,9 +75,23 @@ export function App() {
 
   const hasLines = gcode.length > 0;
 
+  const status = useQuery(getStatus, { refetchInterval: 1000 });
+  const tagProps: TagProps = status.error
+    ? { variant: 'error', label: 'Offline' }
+    : status.data?.busy
+      ? { variant: 'success', label: 'Busy' }
+      : { variant: 'normal', label: 'Idle' };
+
   return (
     <>
-      <Card title="ESP32 Drawing Robot">
+      <Card
+        title={
+          <>
+            Drawing Robot
+            <Tag {...tagProps} />
+          </>
+        }
+      >
         {config.data && (
           <PrintSurface
             config={config.data}

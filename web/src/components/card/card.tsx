@@ -1,7 +1,7 @@
 import s from './card.module.css';
 
 interface CardProps {
-  title?: string;
+  title?: React.ReactNode;
   children: React.ReactNode;
 }
 
