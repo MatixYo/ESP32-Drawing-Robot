@@ -44,3 +44,23 @@
     transform: rotate(-45deg);
   }
 }
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  justify-content: center;
+}
+
+.position {
+  color: #555;
+  font-size: 14px;
+  margin-right: auto;
+
+  span {
+    display: inline-block;
+    min-width: 40px;
+    font-weight: bold;
+  }
+}

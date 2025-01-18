@@ -17,7 +17,7 @@ import { useGCode } from './reducers/gcode-reducer';
 
 export function App() {
   const [toolPosition, setToolPosition] = useState<Position>({ x: 0, y: 0 });
-  const { gcode, clear: clearGCode } = useGCode();
+  const { gcode, addLine, clearAll, clearLine } = useGCode();
   const config = useQuery(getConfig);
 
   return (
@@ -28,16 +28,16 @@ export function App() {
             config={config.data}
             toolPosition={toolPosition}
             setToolPosition={setToolPosition}
+            gcode={gcode}
+            addGCode={addLine}
           />
         )}
-      </Card>
 
-      <Card>
+        <hr />
+
         <ButtonGroup>
-          <Button label="Move pen" onClick={raiseTool} active />
-          <Button label="Draw line" onClick={raiseTool} />
-          <Button label="Clear GCode" onClick={clearGCode} />
-          <Button label="Draw line" onClick={raiseTool} />
+          <Button label="Back" onClick={clearLine} />
+          <Button label="Clear" onClick={clearAll} />
           <Button label="Print" onClick={() => print(gcode)} />
         </ButtonGroup>
       </Card>

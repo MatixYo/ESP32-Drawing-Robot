@@ -1,47 +1,53 @@
 import { useState } from 'react';
-import { f, nmap } from '../../lib/helpers';
+import { f, nmap, normalizePosition } from '../../lib/helpers';
 import { Config } from '../../types/config';
 import { Position } from '../../types/position';
 import { Canvas } from './canvas';
 import s from './print-surface.module.css';
+import { Switch } from '../button/switch';
+import { isToolLowered } from '../../lib/gcode';
 
 interface PrintSurfaceProps {
   config: Config;
   toolPosition: Position;
   setToolPosition: (position: Position) => void;
+  gcode: string[];
+  addGCode: (line: string) => void;
 }
 
-function normalizePosition(e: React.PointerEvent, config: Config): Position {
-  const rect = e.currentTarget.getBoundingClientRect();
-  const x = nmap(
-    e.clientX - rect.left,
-    0,
-    rect.width,
-    config.minX,
-    config.maxX,
-  );
-  const y = nmap(
-    e.clientY - rect.top,
-    0,
-    rect.height,
-    config.minY,
-    config.maxY,
-  );
-
-  return { x, y };
-}
+type Mode = 'move' | 'line' | 'circle';
 
 export function PrintSurface({
   config,
   toolPosition,
   setToolPosition,
+  gcode,
+  addGCode,
 }: PrintSurfaceProps) {
   const width = config.maxX - config.minX;
   const height = config.maxY - config.minY;
 
+  const [mode, setMode] = useState<Mode>('move');
+
+  const handleModeChange = (mode: Mode) => {
+    if (isToolLowered(gcode)) {
+      addGCode('M5');
+    }
+    setMode(mode);
+  };
+
   const handleClick = (e: React.PointerEvent<HTMLDivElement>) => {
     const positon = normalizePosition(e, config);
-    setToolPosition(positon);
+
+    if (mode === 'move') {
+      setToolPosition(positon);
+    }
+    if (mode === 'line') {
+      if (!isToolLowered(gcode)) {
+        addGCode('M3');
+      }
+      addGCode(`G1 X${f(positon.x)} Y${f(positon.y)}`);
+    }
   };
 
   const [hoverPosition, setHoverPosition] = useState<Position | null>(null);
@@ -71,10 +77,19 @@ export function PrintSurface({
         <div className={s.marker} style={markerStyle} />
       </div>
       <div className={s.controls}>
-        <div>
-          X: {f(pos.x)}, Y: {f(pos.y)}
+        <div className={s.position}>
+          X: <span>{f(pos.x)}</span> Y: <span>{f(pos.y)}</span>
         </div>
-        <div></div>
+
+        <Switch
+          options={[
+            { id: 'move', label: 'Move' },
+            { id: 'line', label: 'Line' },
+            { id: 'circle', label: 'Circle' },
+          ]}
+          activeId={mode}
+          setActiveId={handleModeChange}
+        />
       </div>
     </div>
   );

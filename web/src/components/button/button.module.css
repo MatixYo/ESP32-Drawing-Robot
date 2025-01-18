@@ -2,8 +2,8 @@
   background-color: #007acc;
   color: white;
   border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 6px 12px;
+  border: none;
+  padding: 10px 12px;
   font-size: 14px;
   line-height: 1.2;
   font-weight: 500;
@@ -12,12 +12,24 @@
 
   &:hover,
   &.active {
-    background-color: #064c77;
+    background-color: #064e7b;
   }
 
   &:focus,
   &:focus-visible {
-    outline: 4px auto -webkit-focus-ring-color;
+    outline: none;
+  }
+}
+
+.switch {
+  display: flex;
+  gap: 1px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #064e7b;
+
+  .button {
+    border-radius: 0;
   }
 }
 

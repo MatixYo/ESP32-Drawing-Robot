@@ -13,4 +13,10 @@
     margin-bottom: 10px;
     color: #007acc;
   }
+
+  hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 10px 0;
+  }
 }

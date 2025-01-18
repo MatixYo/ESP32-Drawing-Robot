@@ -5,73 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="data:," />
     <title>ESP32 Drawing Robot</title>
-
-    <style>
-      #canvas {
-        width: 100%;
-      }
-
-      .marker {
-        position: absolute;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 2px;
-        height: 20px;
-        transform: translate(-50%, -50%);
-        transition: all 0.2s ease-in-out;
-      }
-
-      .marker::before,
-      .marker::after {
-        content: '';
-        position: absolute;
-        width: 2px;
-        height: 100%;
-        border-radius: 9999px;
-        background-color: #333;
-      }
-
-      .marker::before {
-        transform: rotate(45deg);
-      }
-
-      .marker::after {
-        transform: rotate(-45deg);
-      }
-
-      #bed-container.move #button-move,
-      #bed-container.line #button-line {
-        background-color: #00497a;
-      }
-
-      .position {
-        display: flex;
-        justify-content: space-between;
-        margin: 10px 0;
-        color: #555;
-        font-weight: bold;
-        font-size: 14px;
-      }
-    </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
 
   <body>
-    <h1>ESP32 Drawing Robot</h1>
-
-    <div class="container move" id="bed-container">
-      <h2>Set XY Position</h2>
-      <div class="bed" onclick="handleBedClick(event)">
-        <canvas id="canvas"></canvas>
-        <div class="marker"></div>
-      </div>
-      <div class="position">
-        <div id="targetPosition"></div>
-        <div id="mousePosition"></div>
-      </div>
-    </div>
-
     <script>
       // const X_POS = %X_POS%;
       // const Y_POS = %Y_POS%;
