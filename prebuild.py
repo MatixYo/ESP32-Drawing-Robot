@@ -33,12 +33,16 @@ else:
         
 # Perform new build otherwise
 if build:
+    print("Building project...")
     if not os.path.exists("web/node_modules"):
         env.Execute("cd web && npm install")
 
-    env.Execute("cd web && npm build:full")
+    env.Execute("cd web && npm run build")
+    env.Execute("python hexdump.py")
 
     with open(hash_file, "w") as f:
         f.write(prj_hash)
+else:
+    print("No changes detected. Skipping build.")
 
 print("Prebuild script finished.")
