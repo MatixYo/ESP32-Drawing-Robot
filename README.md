@@ -8,6 +8,7 @@ You can find the 3D model for this project on MakerWorld:
 [Tenstar C3 Mini Model](https://makerworld.com/en/models/978425)
 
 ## File Structure
+- `/web`: Web app files
 - `/src`: Source code files
 - `/include`: Header files
 - `/lib`: Libraries

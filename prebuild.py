@@ -33,10 +33,10 @@ else:
         
 # Perform new build otherwise
 if build:
-    if not os.path.exists("node_modules"):
-        env.Execute("pnpm install")
+    if not os.path.exists("web/node_modules"):
+        env.Execute("cd web && npm install")
 
-    env.Execute("pnpm build:full")
+    env.Execute("cd web && npm build:full")
 
     with open(hash_file, "w") as f:
         f.write(prj_hash)
