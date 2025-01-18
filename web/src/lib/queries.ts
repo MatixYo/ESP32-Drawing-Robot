@@ -23,6 +23,10 @@ export function home() {
   return sendGCode('G28');
 }
 
+export function setSpeed(speed: number) {
+  return sendGCode(`M203 X${speed}`);
+}
+
 export function restart() {
   return post('/restart');
 }

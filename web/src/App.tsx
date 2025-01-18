@@ -14,10 +14,12 @@ import {
   restart,
   getConfig,
   print,
+  setSpeed,
 } from './lib/queries';
 import { useGCode } from './reducers/gcode-reducer';
 import { Config } from './types/config';
 import { handleStopPropagation, downloadFile, readFile } from './lib/helpers';
+import { Slider } from './components/slider/slider';
 
 const initialConfig: Config = {
   minX: -50,
@@ -26,7 +28,9 @@ const initialConfig: Config = {
   maxY: 125,
   homeX: 0,
   homeY: 25,
-  speed: 150,
+  speed: 100,
+  minSpeed: 10,
+  maxSpeed: 200,
 };
 
 export function App() {
@@ -119,10 +123,20 @@ export function App() {
           <Button label="Restart ESP" onClick={restart} />
           <Button label="Assembly" onClick={assembly} />
         </ButtonGroup>
+
+        <hr />
+
+        <Slider
+          label="Speed:"
+          value={config.data?.speed || 0}
+          onChange={setSpeed}
+          min={config.data?.minSpeed}
+          max={config.data?.maxSpeed}
+        />
       </Card>
 
       {gcode.length > 0 && (
-        <Card title="GCode">
+        <Card title={`GCode (${gcode.length})`} expandable>
           <pre>{gcode.join('\n')}</pre>
         </Card>
       )}

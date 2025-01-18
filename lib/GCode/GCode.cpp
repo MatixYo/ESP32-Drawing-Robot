@@ -55,6 +55,14 @@ void executeLine(GCodeLine &gline)
         Serial.println("M999: Restarting ESP...");
         ESP.restart();
     }
+    else if(gline.cmd == "M203") {
+        float newSpeed = gline.params["X"];
+        Serial.printf("M203: Setting speed to %.2f\n", newSpeed);
+        setSpeed(newSpeed);
+    }
+    else {
+        Serial.printf("Unknown command: %s\n", gline.cmd.c_str());
+    }
 }
 
 // Public methods

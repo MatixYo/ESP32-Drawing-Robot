@@ -23,6 +23,9 @@ int delayUntil;
 // Last update time
 int lastUpdate;
 
+// Speed
+float speed = DEFAULT_SPEED;
+
 // Static functions
 /**
  * @brief Returns the angle between two points in radians (-
@@ -117,7 +120,7 @@ void updateLinearMove(float delta)
     if (!linearTargetPosition)
         return;
 
-    float travelDistance = SPEED * delta;
+    float travelDistance = speed * delta;
 
     // Calculate the distance to the target point
     float dx = currentPosition.x - linearTargetPosition->x;
@@ -146,7 +149,7 @@ void updateArcMove(float delta)
 
     Arc &arc = *arcTarget;
 
-    float angularDeltaRad = SPEED * delta / arc.radius;
+    float angularDeltaRad = speed * delta / arc.radius;
 
     float currentAngleRad = angleBetweenPoints(arc.center, currentPosition);
     float angleIncrement = arc.dir * angularDeltaRad;
@@ -255,4 +258,14 @@ void assemblyPosition()
 bool isBusy()
 {
     return linearTargetPosition || arcTarget || millis() < delayUntil;
+}
+
+float getSpeed()
+{
+    return speed;
+}
+
+void setSpeed(float newSpeed)
+{
+    speed = constrain(newSpeed, MIN_SPEED, MAX_SPEED);
 }

@@ -6,4 +6,6 @@ export interface Config {
   homeX: number;
   homeY: number;
   speed: number;
+  minSpeed: number;
+  maxSpeed: number;
 }
