@@ -99,7 +99,9 @@ void setup()
       doc["maxY"] = MAX_Y;
       doc["homeX"] = HOMING_POSITION.x;
       doc["homeY"] = HOMING_POSITION.y;
-      doc["speed"] = SPEED;
+      doc["speed"] = getSpeed();
+      doc["minSpeed"] = MIN_SPEED;
+      doc["maxSpeed"] = MAX_SPEED;
 
       serializeJson(doc, *response);
 

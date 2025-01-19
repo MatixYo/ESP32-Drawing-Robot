@@ -36,6 +36,20 @@ void executeLine(GCodeLine &gline)
         Serial.printf("G1: Linear move to X: %.2f, Y: %.2f\n", pos.x, pos.y);
         linearMove(pos);
     }
+    else if(gline.cmd == "G2" || gline.cmd == "G3") {
+        Position center;
+        center.x = gline.params["I"];
+        center.y = gline.params["J"];
+
+        Position end;
+        end.x = gline.params["X"];
+        end.y = gline.params["Y"];
+
+        bool clockwise = gline.cmd == "G2";
+
+        Serial.printf("%s: Arc move to X: %.2f, Y: %.2f, I: %.2f, J: %.2f\n", gline.cmd, end.x, end.y, center.x, center.y);
+        arcMove(center, clockwise, &end);
+    }
     else if (gline.cmd == "G28")
     {
         Serial.println("G28: Homing XY");
@@ -54,6 +68,14 @@ void executeLine(GCodeLine &gline)
     else if (gline.cmd == "M999") {
         Serial.println("M999: Restarting ESP...");
         ESP.restart();
+    }
+    else if(gline.cmd == "M203") {
+        float newSpeed = gline.params["X"];
+        Serial.printf("M203: Setting speed to %.2f\n", newSpeed);
+        setSpeed(newSpeed);
+    }
+    else {
+        Serial.printf("Unknown command: %s\n", gline.cmd.c_str());
     }
 }
 

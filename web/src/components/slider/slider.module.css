@@ -1,0 +1,42 @@
+.sliderContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 10px 0;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #007acc;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rangeInput {
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #ddd;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.rangeInput::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #666;
+  border-radius: 50%;
+
+  background-color: #007acc;
+}
+
+.valueDisplay {
+  font-size: 13px;
+  color: #444;
+}

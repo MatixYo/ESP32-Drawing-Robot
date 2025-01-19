@@ -23,6 +23,9 @@ int delayUntil;
 // Last update time
 int lastUpdate;
 
+// Speed
+float speed = DEFAULT_SPEED;
+
 // Static functions
 /**
  * @brief Returns the angle between two points in radians (-
@@ -91,25 +94,27 @@ bool setServoAngles(Angles &angles)
     int left = map(angles.left * 100, 0, 18000, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
     int right = map(angles.right * 100, 0, 18000, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
 
+    if(left < MIN_PULSE_WIDTH || left > MAX_PULSE_WIDTH || right < MIN_PULSE_WIDTH || right > MAX_PULSE_WIDTH) return false;
+    
     servoLeft.write(left);
     servoRight.write(right);
 
-    // TODO: add checks
     return true;
 }
 
-bool setPenPosition(const Position &position)
+void setPenPosition(const Position &position)
 {
     Angles angles;
 
-    if (calculateServoAngles(position, angles))
-    {
-        setServoAngles(angles);
-        currentPosition = position;
-        return true;
-    }
+    bool canMove = calculateServoAngles(position, angles);
+    bool canSet = setServoAngles(angles);
 
-    return false;
+    // In case of unreachable position, restart the ESP
+    if(!canMove || !canSet) {
+        ESP.restart();
+    }
+    
+    currentPosition = position;
 }
 
 void updateLinearMove(float delta)
@@ -117,7 +122,7 @@ void updateLinearMove(float delta)
     if (!linearTargetPosition)
         return;
 
-    float travelDistance = SPEED * delta;
+    float travelDistance = speed * delta;
 
     // Calculate the distance to the target point
     float dx = currentPosition.x - linearTargetPosition->x;
@@ -146,7 +151,7 @@ void updateArcMove(float delta)
 
     Arc &arc = *arcTarget;
 
-    float angularDeltaRad = SPEED * delta / arc.radius;
+    float angularDeltaRad = speed * delta / arc.radius;
 
     float currentAngleRad = angleBetweenPoints(arc.center, currentPosition);
     float angleIncrement = arc.dir * angularDeltaRad;
@@ -228,8 +233,6 @@ void arcMove(Position center, bool clockwise, Position *end)
     arc.angleDelta = 0;
 
     arcTarget = &arc;
-
-    Serial.printf("Moving in an arc.\n");
 }
 
 void internalEnableTool(bool enable)
@@ -255,4 +258,14 @@ void assemblyPosition()
 bool isBusy()
 {
     return linearTargetPosition || arcTarget || millis() < delayUntil;
+}
+
+float getSpeed()
+{
+    return speed;
+}
+
+void setSpeed(float newSpeed)
+{
+    speed = constrain(newSpeed, MIN_SPEED, MAX_SPEED);
 }

@@ -23,6 +23,10 @@ export function home() {
   return sendGCode('G28');
 }
 
+export function setSpeed(speed: number) {
+  return sendGCode(`M203 X${speed}`);
+}
+
 export function restart() {
   return post('/restart');
 }
@@ -38,8 +42,8 @@ export function print(g: string[]) {
 }
 
 // Queries
-export function getStatus(): Promise<Status> {
-  return get<Status>('/status');
+export function getStatus(options?: RequestInit): Promise<Status> {
+  return get<Status>('/status', options);
 }
 
 export function getConfig(): Promise<Config> {

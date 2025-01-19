@@ -1,13 +1,15 @@
 import { useRef, useState } from 'preact/hooks';
 
-import { nmap, normalizePosition } from '../../lib/helpers';
+import { calculateDistance, nmap, normalizePosition } from '../../lib/helpers';
 import { Config } from '../../types/config';
 import { Position } from '../../types/position';
 import { Canvas } from './canvas';
 import s from './print-surface.module.css';
 import { Switch } from '../button/switch';
-import { isToolLowered, moveGCode, f } from '../../lib/gcode';
+import { isToolLowered, moveGCode, f, parseGCodeLine } from '../../lib/gcode';
 import { useOutsideClick } from '../../hooks/use-outside-click';
+
+const FREE_MOVE_THRESHOLD = 1;
 
 interface PrintSurfaceProps {
   config: Config;
@@ -17,7 +19,7 @@ interface PrintSurfaceProps {
   addGCode: (line: string | string[]) => void;
 }
 
-type Mode = 'move' | 'line' | 'circle';
+export type DrawMode = 'move' | 'free' | 'line' | 'circle';
 
 export function PrintSurface({
   config,
@@ -29,28 +31,62 @@ export function PrintSurface({
   const width = config.maxX - config.minX;
   const height = config.maxY - config.minY;
 
-  const [mode, setMode] = useState<Mode>('move');
+  const [mode, setMode] = useState<DrawMode>('move');
+  const [circleCenter, setCircleCenter] = useState<Position | null>(null);
 
-  const handleClick = (e: React.PointerEvent<HTMLDivElement>) => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const positon = normalizePosition(e, config);
 
     if (mode === 'move') {
       setToolPosition(positon);
     }
-    if (mode === 'line') {
+    if (['line', 'free'].includes(mode)) {
       if (!isToolLowered(gcode)) {
         addGCode([moveGCode(positon), 'M3']);
       }
       addGCode(moveGCode(positon));
     }
+    if (mode === 'circle') {
+      if (!circleCenter) {
+        setCircleCenter(positon);
+      } else {
+        if (!isToolLowered(gcode)) {
+          addGCode([moveGCode(positon), 'M3']);
+        }
+        addGCode([
+          `G2 X${f(positon.x)} Y${f(positon.y)} I${f(circleCenter.x)} J${f(circleCenter.y)}`,
+          'M5',
+        ]);
+        setCircleCenter(null);
+      }
+    }
   };
 
   const [hoverPosition, setHoverPosition] = useState<Position | null>(null);
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    setHoverPosition(normalizePosition(e, config));
+    const normalized = normalizePosition(e, config);
+    setHoverPosition(normalized);
+
+    if (mode === 'free' && e.buttons === 1) {
+      const last = parseGCodeLine(gcode.at(-1) || '');
+
+      if (last?.cmd === 'G1') {
+        const lastPosition = { x: last.params['X'], y: last.params['Y'] };
+        if (calculateDistance(lastPosition, normalized) < FREE_MOVE_THRESHOLD)
+          return;
+      }
+
+      addGCode(moveGCode(normalized));
+    }
   };
   const handlePointerLeave = () => {
     setHoverPosition(null);
+  };
+
+  const handlePointerUp = () => {
+    if (mode === 'free' && isToolLowered(gcode)) {
+      addGCode('M5');
+    }
   };
 
   const pos = hoverPosition || toolPosition;
@@ -62,6 +98,7 @@ export function PrintSurface({
 
   const containerRef = useRef<HTMLDivElement>(null);
   useOutsideClick(containerRef, () => {
+    setCircleCenter(null);
     if (isToolLowered(gcode)) {
       addGCode('M5');
     }
@@ -73,7 +110,8 @@ export function PrintSurface({
         className={s.canvasWrapper}
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
-        onClick={handleClick}
+        onPointerUp={handlePointerUp}
+        onPointerDown={handlePointerDown}
         ref={containerRef}
       >
         <Canvas
@@ -81,7 +119,9 @@ export function PrintSurface({
           height={height}
           gcode={gcode}
           config={config}
-          hoverPosition={(mode === 'line' && hoverPosition) || null}
+          drawMode={mode}
+          circleCenter={circleCenter}
+          hoverPosition={hoverPosition}
         />
         <div className={s.marker} style={markerStyle} />
       </div>
@@ -93,8 +133,9 @@ export function PrintSurface({
         <Switch
           options={[
             { id: 'move', label: 'Move' },
+            { id: 'free', label: 'Free' },
             { id: 'line', label: 'Line' },
-            // { id: 'circle', label: 'Circle' },
+            { id: 'circle', label: 'Circle' },
           ]}
           activeId={mode}
           setActiveId={setMode}

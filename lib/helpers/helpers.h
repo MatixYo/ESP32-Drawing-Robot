@@ -27,3 +27,7 @@ void assemblyPosition();
 bool isBusy();
 
 void updateToolPosition();
+
+void setSpeed(float newSpeed);
+
+float getSpeed();
