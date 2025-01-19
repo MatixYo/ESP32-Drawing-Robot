@@ -102,18 +102,20 @@ bool setServoAngles(Angles &angles)
     return true;
 }
 
-bool setPenPosition(const Position &position)
+void setPenPosition(const Position &position)
 {
     Angles angles;
 
-    if (calculateServoAngles(position, angles))
+    bool canMove = calculateServoAngles(position, angles);
+    bool canSet = setServoAngles(angles);
+
+    if (canMove && canSet)
     {
-        setServoAngles(angles);
         currentPosition = position;
-        return true;
     }
 
-    return false;
+    // In case of unreachable position, restart the ESP
+    ESP.restart();
 }
 
 void updateLinearMove(float delta)

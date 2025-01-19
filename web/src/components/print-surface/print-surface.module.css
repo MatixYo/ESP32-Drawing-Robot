@@ -10,6 +10,9 @@
     linear-gradient(90deg, rgba(28, 117, 180, 0.3) 0.1em, transparent 0.1em);
   background-size: 40px 40px;
   cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .canvas {
@@ -48,6 +51,7 @@
 .controls {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   padding: 10px;
   justify-content: center;
