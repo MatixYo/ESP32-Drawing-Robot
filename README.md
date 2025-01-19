@@ -30,6 +30,10 @@ You can find the 3D model for this project on MakerWorld:
 You can configure the project by changing the `/include/config.h` file.
 Distance between servos and distance of linkages can be configured.
 
+## Known Issues
+
+It's possible to select position that is not reachable by the robot. This will cause the robot to restart.
+
 ## Development Server
 
 To run the development server for the web app, run:
