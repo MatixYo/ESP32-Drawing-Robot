@@ -233,8 +233,6 @@ void arcMove(Position center, bool clockwise, Position *end)
     arc.angleDelta = 0;
 
     arcTarget = &arc;
-
-    Serial.printf("Moving in an arc.\n");
 }
 
 void internalEnableTool(bool enable)
