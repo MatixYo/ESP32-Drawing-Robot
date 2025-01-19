@@ -109,13 +109,12 @@ void setPenPosition(const Position &position)
     bool canMove = calculateServoAngles(position, angles);
     bool canSet = setServoAngles(angles);
 
-    if (canMove && canSet)
-    {
-        currentPosition = position;
-    }
-
     // In case of unreachable position, restart the ESP
-    ESP.restart();
+    if(!canMove || !canSet) {
+        ESP.restart();
+    }
+    
+    currentPosition = position;
 }
 
 void updateLinearMove(float delta)
