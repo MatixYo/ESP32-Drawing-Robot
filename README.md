@@ -1,5 +1,7 @@
 # Scara Drawing Robot
 
+![Uploading IMG_1262-ezgif.com-optimize.gif…]()
+
 ## Overview
 
 This project is for making a Scara Drawing Robot with ESP32 S3 controller and 3 servo motors.
