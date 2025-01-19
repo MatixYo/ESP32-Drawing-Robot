@@ -36,6 +36,7 @@ export function useQuery<T>(
       try {
         const response = await queryFn(signal); // Pass the signal to the query function
         setData(response);
+        setError(null);
       } catch (err) {
         if (err instanceof Error && err.name !== 'AbortError') {
           setError(err instanceof Error ? err : new Error('Unknown error'));

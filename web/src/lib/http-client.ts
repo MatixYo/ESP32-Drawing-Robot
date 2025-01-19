@@ -12,13 +12,14 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   return response.text() as T;
 }
 
-export function get<T>(url: string): Promise<T> {
-  return request(url);
+export function get<T>(url: string, options?: RequestInit): Promise<T> {
+  return request(url, options);
 }
 
 export function post<T, D extends Record<string, any>>(
   url: string,
   data?: D,
+  options?: RequestInit,
 ): Promise<T> {
   const body = new FormData();
   for (const key in data) {
@@ -28,5 +29,6 @@ export function post<T, D extends Record<string, any>>(
   return request(url, {
     method: 'POST',
     body: data ? body : undefined,
+    ...options,
   });
 }
