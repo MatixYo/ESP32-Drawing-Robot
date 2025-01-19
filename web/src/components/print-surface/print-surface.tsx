@@ -81,7 +81,6 @@ export function PrintSurface({
   };
   const handlePointerLeave = () => {
     setHoverPosition(null);
-    setCircleCenter(null);
   };
 
   const handlePointerUp = () => {
@@ -99,6 +98,7 @@ export function PrintSurface({
 
   const containerRef = useRef<HTMLDivElement>(null);
   useOutsideClick(containerRef, () => {
+    setCircleCenter(null);
     if (isToolLowered(gcode)) {
       addGCode('M5');
     }
