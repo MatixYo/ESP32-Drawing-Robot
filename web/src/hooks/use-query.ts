@@ -61,7 +61,7 @@ export function useQuery<T>(
     return () => {
       controller.abort(); // Abort the ongoing request if the effect is cleaned up
     };
-  }, [queryFn, enabled, refetchInterval]);
+  }, [enabled, refetchInterval]);
 
   return { data, error, isLoading };
 }
