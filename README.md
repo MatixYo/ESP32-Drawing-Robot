@@ -1,6 +1,6 @@
 # Scara Drawing Robot
 
-![Uploading IMG_1262-ezgif.com-optimize.gif…]()
+![IMG_1262-ezgif com-optimize](https://github.com/user-attachments/assets/8ba335ce-78a2-4f69-bf28-65f6955566e9)
 
 ## Overview
 
