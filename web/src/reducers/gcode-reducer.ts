@@ -12,11 +12,12 @@ function gcodeReducer(state: GCodeState, action: GCodeAction): GCodeState {
   switch (action.type) {
     case 'SET_GCODE':
       return action.payload;
-    case 'ADD_GCODE_LINE':
+    case 'ADD_GCODE_LINE': {
       const lines = Array.isArray(action.payload)
         ? action.payload
         : [action.payload];
       return [...state, ...lines];
+    }
     case 'CLEAR_LINE':
       return state.slice(0, -1);
     case 'CLEAR_GCODE':

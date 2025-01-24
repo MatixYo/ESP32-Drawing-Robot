@@ -16,14 +16,14 @@ export function get<T>(url: string, options?: RequestInit): Promise<T> {
   return request(url, options);
 }
 
-export function post<T, D extends Record<string, any>>(
+export function post<T, D extends Record<string, unknown>>(
   url: string,
   data?: D,
   options?: RequestInit,
 ): Promise<T> {
   const body = new FormData();
   for (const key in data) {
-    body.append(key, data[key]);
+    body.append(key, data[key] as string | Blob);
   }
 
   return request(url, {
