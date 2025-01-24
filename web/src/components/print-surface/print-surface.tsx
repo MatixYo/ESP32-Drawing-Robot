@@ -1,4 +1,5 @@
 import { useRef, useState } from 'preact/hooks';
+import { PointerEvent } from 'preact/compat';
 
 import { calculateDistance, nmap, normalizePosition } from '../../lib/helpers';
 import { Config } from '../../types/config';
@@ -34,7 +35,7 @@ export function PrintSurface({
   const [mode, setMode] = useState<DrawMode>('move');
   const [circleCenter, setCircleCenter] = useState<Position | null>(null);
 
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+  const handlePointerDown = (e: PointerEvent<HTMLDivElement>) => {
     const positon = normalizePosition(e, config);
 
     if (mode === 'move') {
@@ -63,7 +64,7 @@ export function PrintSurface({
   };
 
   const [hoverPosition, setHoverPosition] = useState<Position | null>(null);
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+  const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
     const normalized = normalizePosition(e, config);
     setHoverPosition(normalized);
 
