@@ -5,8 +5,8 @@ export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function handleStopPropagation(cb: () => void) {
-  return (e: React.MouseEvent) => {
+export function handleStopPropagation<T extends EventTarget>(cb: () => void) {
+  return (e: React.MouseEvent<T>) => {
     e.stopPropagation();
     cb();
   };

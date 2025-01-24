@@ -138,7 +138,7 @@ export function PrintSurface({
             { id: 'circle', label: 'Circle' },
           ]}
           activeId={mode}
-          setActiveId={setMode}
+          setActiveId={id => setMode(id as DrawMode)}
         />
       </div>
     </div>
