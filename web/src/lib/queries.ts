@@ -37,7 +37,9 @@ export function assembly() {
 
 export function print(g: string[]) {
   const gcode = [...g];
-  isToolLowered(gcode) && gcode.push('M5');
+  if (isToolLowered(gcode)) {
+    gcode.push('M5');
+  }
   return sendGCode([...gcode, 'G28']);
 }
 

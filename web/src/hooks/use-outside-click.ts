@@ -1,9 +1,10 @@
+import { RefObject } from 'preact/compat';
 import { useEffect } from 'preact/hooks';
 
 export function useOutsideClick<T extends HTMLElement>(
-  ref: React.RefObject<T>,
+  ref: RefObject<T>,
   callback: (event: MouseEvent | TouchEvent) => void,
-): React.RefObject<T> {
+): RefObject<T> {
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
       if (ref.current && !ref.current.contains(event.target as Node)) {

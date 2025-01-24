@@ -1,10 +1,11 @@
 import { useState } from 'preact/hooks';
 import { Button } from '../button/button';
 import s from './card.module.css';
+import { ReactNode } from 'preact/compat';
 
 interface CardProps {
-  title?: React.ReactNode;
-  children: React.ReactNode;
+  title?: ReactNode;
+  children: ReactNode;
   expandable?: boolean;
 }
 

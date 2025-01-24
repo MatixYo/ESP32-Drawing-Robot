@@ -1,11 +1,11 @@
+import { ButtonHTMLAttributes } from 'preact/compat';
 import cn from 'clsx';
+import s from './button.module.css';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
   active?: boolean;
 }
-
-import s from './button.module.css';
 
 export function Button({ label, active, ...props }: ButtonProps) {
   return (

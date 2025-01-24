@@ -1,3 +1,4 @@
+import { MouseEvent, PointerEvent } from 'preact/compat';
 import { Config } from '../types/config';
 import { Position } from '../types/position';
 
@@ -5,8 +6,8 @@ export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function handleStopPropagation(cb: () => void) {
-  return (e: React.MouseEvent) => {
+export function handleStopPropagation<T extends EventTarget>(cb: () => void) {
+  return (e: MouseEvent<T>) => {
     e.stopPropagation();
     cb();
   };
@@ -23,7 +24,7 @@ export function nmap(
 }
 
 export function normalizePosition(
-  e: React.PointerEvent<HTMLDivElement>,
+  e: PointerEvent<HTMLDivElement>,
   config: Config,
 ): Position {
   const rect = e.currentTarget.getBoundingClientRect();
