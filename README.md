@@ -21,16 +21,19 @@ You can find the 3D model for this project on MakerWorld:
 
 ## Getting Started
 
-1. Clone the repository.
-2. Open the project in PlatformIO.
-3. Build and upload the project to your microcontroller.
-4. Open the terminal and check the IP address of the ESP32. When it connects, it will home the servos.
-5. Enter the IP address of the ESP32 and open the web app in your browser.
+1. Download the latest firmware release from the [GitHub releases page](releases).
+2. Flash the firmware to your ESP32 using [ESPHome Flasher](https://web.esphome.io/). **Note:** You need to click "Install" on the ESPHome Flasher page to use it.
+3. Once flashed, the ESP32 will connect to your network and home the servos automatically.
+4. Access the web interface by entering the IP address of the ESP32 in your browser, or use the default domain `drawer.local` (note: not all devices support mDNS, so you may need to use the IP address instead).
 
 ## Config
 
 You can configure the project by changing the `/include/config.h` file.
 Distance between servos and distance of linkages can be configured.
+
+### Custom Domain
+
+The device is accessible by default at `drawer.local` via mDNS. However, not all devices support mDNS, so you may need to use the IP address instead. You can configure a custom domain in the configuration file if needed.
 
 ## Known Issues
 

@@ -3,6 +3,7 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
+#include <ESPmDNS.h>
 
 // Own libraries
 #include <config.h>
@@ -34,6 +35,15 @@ void setup()
   Serial.println("\nWiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+
+  // Initialize mDNS with local domain
+  if (MDNS.begin(LOCAL_DOMAIN)) {
+    Serial.print("mDNS responder started. Access device at: http://");
+    Serial.print(LOCAL_DOMAIN);
+    Serial.println("/");
+  } else {
+    Serial.println("Error setting up mDNS responder!");
+  }
 
   Serial.println("Homing XY.");
   homeXY();
