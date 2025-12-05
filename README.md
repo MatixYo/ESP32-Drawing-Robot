@@ -26,6 +26,17 @@ You can find the 3D model for this project on MakerWorld:
 3. Once flashed, the ESP32 will connect to your network and home the servos automatically.
 4. Access the web interface by entering the IP address of the ESP32 in your browser, or use the default domain `drawer.local` (note: not all devices support mDNS, so you may need to use the IP address instead).
 
+## Building from Source
+
+To build a flashable firmware file from source:
+
+1. Clone the repository and open the project in PlatformIO.
+2. Run the following command to create a merged firmware binary:
+   ```sh
+   pio run -t mergebin
+   ```
+3. This will create a flashable binary at `.pio/build/lolin_c3_mini/firmware-merged.bin` that can be flashed using the [ESPHome Flasher](https://web.esphome.io/). You can also just flash it via Platform.io.
+
 ## Config
 
 You can configure the project by changing the `/include/config.h` file.
