@@ -44,7 +44,7 @@ Distance between servos and distance of linkages can be configured.
 
 ### Custom Domain
 
-The device is accessible by default at `drawer.local` via mDNS. However, not all devices support mDNS, so you may need to use the IP address instead. You can configure a custom domain in the configuration file if needed.
+The device is accessible by default at `draw.local` via mDNS. However, not all devices support mDNS, so you may need to use the IP address instead. You can configure a custom domain in the configuration file if needed.
 
 ## Known Issues
 
